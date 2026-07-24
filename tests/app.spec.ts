@@ -65,24 +65,170 @@ test.describe("Día detail page", () => {
 });
 
 test.describe("Favoritos", () => {
-  test("añadir y quitar favorito", async ({ page }) => {
+  test.beforeEach(async ({ context }) => {
+    await context.grantPermissions(["notifications"]);
+  });
+
+  test("estrella cambia de ☆ a ★ al añadir favorito", async ({ page }) => {
     await page.goto("/dia/9");
-    const favBtn = page.locator('button[aria-label*="favoritos"]').first();
+    await page.waitForSelector(".evento-card");
+    const favBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
     await expect(favBtn).toBeVisible();
+    expect((await favBtn.innerText()).trim()).toBe("☆");
 
     await favBtn.click();
     await page.waitForTimeout(200);
 
-    const label = await favBtn.getAttribute("aria-label");
-    expect(label).toContain("favoritos");
+    const removeBtn = page.locator('button[aria-label="Quitar de favoritos"]').first();
+    await expect(removeBtn).toBeVisible();
+    expect((await removeBtn.innerText()).trim()).toBe("★");
+  });
+
+  test("estrella cambia de ★ a ☆ al quitar favorito", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    const favBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await favBtn.click();
+    await page.waitForTimeout(200);
+    expect((await page.locator('button[aria-label="Quitar de favoritos"]').first().innerText()).trim()).toBe("★");
+
+    const removeBtn = page.locator('button[aria-label="Quitar de favoritos"]').first();
+    await removeBtn.click();
+    await page.waitForTimeout(200);
+
+    const reAddBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await expect(reAddBtn).toBeVisible();
+    expect((await reAddBtn.innerText()).trim()).toBe("☆");
+  });
+
+  test("favorito persiste al recargar la página", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    const favBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await favBtn.click();
+    await page.waitForTimeout(200);
+    expect((await page.locator('button[aria-label="Quitar de favoritos"]').first().innerText()).trim()).toBe("★");
+
+    await page.reload();
+    await page.waitForSelector(".evento-card");
+
+    const starBtn = page.locator('button[aria-label="Quitar de favoritos"]').first();
+    await expect(starBtn).toBeVisible();
+    expect((await starBtn.innerText()).trim()).toBe("★");
+  });
+
+  test("múltiples favoritos se añaden correctamente", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    const firstBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await firstBtn.click();
+    await page.waitForTimeout(300);
+
+    const secondBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await secondBtn.click();
+    await page.waitForTimeout(300);
+
+    const favs = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("sanlorenzo-favoritos") || "[]")
+    );
+    expect(favs.length).toBe(2);
+
+    await page.goto("/favoritos");
+    await page.waitForSelector(".evento-card");
+    const cards = page.locator(".evento-card");
+    expect(await cards.count()).toBe(2);
   });
 
   test("página de favoritos muestra eventos guardados", async ({ page }) => {
     await page.goto("/dia/9");
-    const favBtn = page.locator('button[aria-label*="favoritos"]').first();
-    await favBtn.click();
+    await page.waitForSelector(".evento-card");
+
+    await page.locator('button[aria-label="Añadir a favoritos"]').first().click();
+    await page.waitForTimeout(200);
+
     await page.goto("/favoritos");
     await expect(page.locator("text=Mis Favoritos")).toBeVisible();
+    await expect(page.locator("text=eventos guardados")).toBeVisible();
+    const cards = page.locator(".evento-card");
+    expect(await cards.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  test("página de favoritos muestra estado vacío sin favoritos", async ({ page }) => {
+    await page.goto("/favoritos");
+    await expect(page.locator("text=No tienes favoritos aún")).toBeVisible();
+    await expect(page.locator("text=Explorar programa")).toBeVisible();
+  });
+
+  test("se puede quitar favorito desde la página de favoritos", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    await page.locator('button[aria-label="Añadir a favoritos"]').first().click();
+    await page.waitForTimeout(200);
+
+    await page.goto("/favoritos");
+    await page.waitForSelector(".evento-card");
+
+    const removeBtn = page.locator('button[aria-label="Quitar de favoritos"]').first();
+    await removeBtn.click();
+    await page.waitForTimeout(300);
+
+    await expect(page.locator("text=No tienes favoritos aún")).toBeVisible();
+  });
+
+  test("favoritos de diferentes días aparecen agrupados", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+    await page.locator('button[aria-label="Añadir a favoritos"]').first().click();
+    await page.waitForTimeout(200);
+
+    await page.goto("/dia/10");
+    await page.waitForSelector(".evento-card");
+    await page.locator('button[aria-label="Añadir a favoritos"]').first().click();
+    await page.waitForTimeout(200);
+
+    await page.goto("/favoritos");
+    await page.waitForSelector(".evento-card");
+    const groups = page.locator("section h2");
+    expect(await groups.count()).toBeGreaterThanOrEqual(2);
+  });
+
+  test("favoritos persisten entre navegación de páginas", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    await page.locator('button[aria-label="Añadir a favoritos"]').first().click();
+    await page.waitForTimeout(200);
+
+    await page.goto("/conciertos");
+    await page.waitForTimeout(300);
+
+    await page.goto("/favoritos");
+    await page.waitForSelector(".evento-card");
+    const cards = page.locator(".evento-card");
+    expect(await cards.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  test("toggle rápido no corrompe estado", async ({ page }) => {
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    const favBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await favBtn.click();
+    await page.waitForTimeout(100);
+
+    const removeBtn = page.locator('button[aria-label="Quitar de favoritos"]').first();
+    await removeBtn.click();
+    await page.waitForTimeout(100);
+
+    const reAddBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await reAddBtn.click();
+    await page.waitForTimeout(100);
+
+    expect((await page.locator('button[aria-label="Quitar de favoritos"]').first().innerText()).trim()).toBe("★");
   });
 });
 

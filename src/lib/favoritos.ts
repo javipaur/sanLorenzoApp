@@ -16,10 +16,19 @@ function leerFavoritos(): string[] {
 
 let cacheFavoritos: string[] = [];
 let cacheLoaded = false;
+const listeners: Set<() => void> = new Set();
+
+function emitChange() {
+  for (const listener of listeners) listener();
+}
 
 function subscribe(callback: () => void) {
+  listeners.add(callback);
   window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
+  return () => {
+    listeners.delete(callback);
+    window.removeEventListener("storage", callback);
+  };
 }
 
 function getSnapshot() {
@@ -37,6 +46,7 @@ function setFavoritos(next: string[]) {
   } catch {
     // localStorage unavailable
   }
+  emitChange();
 }
 
 export function useFavoritos() {
