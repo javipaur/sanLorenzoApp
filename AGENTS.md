@@ -24,6 +24,7 @@ npm run build      # Build de producción
 npm run start      # Servidor producción
 npm run lint       # ESLint
 npm run typecheck  # tsc --noEmit
+npm run test       # Playwright E2E tests
 ```
 
 Ejecutar `lint -> typecheck -> build` antes de cada commit.

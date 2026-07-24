@@ -58,7 +58,7 @@ export const lugares: LugaresMapa[] = [
   { id: "parque-universidad", nombre: "Parque Universidad", lat: 42.1395, lng: -0.4115, zona: "universidad", direccion: "Parque Universidad, 22002 Huesca" },
   { id: "parque-encuentro", nombre: "Parque del Encuentro", lat: 42.1330, lng: -0.4040, zona: "perpetuo-socorro", direccion: "Parque del Encuentro, Barrio Perpetuo Socorro, 22002 Huesca" },
   { id: "parque-san-martin", nombre: "Parque San Martín", lat: 42.1325, lng: -0.4055, zona: "santo-domingo", direccion: "Parque San Martín, Barrio de Santo Domingo, 22002 Huesca" },
-  { id: "parque-walqa", nombre: "Parque Tecnológico Walqa", lat: 42.0950, lng: -0.3850, zona: "walqa", direccion: "Parque Tecnológico Walqa, Carretera de Barbastre, km 1, 22197 Huesca" },
+  { id: "parque-walqa", nombre: "Parque Tecnológico Walqa", lat: 42.1078, lng: -0.4572, zona: "walqa", direccion: "Parque Tecnológico Walqa, Ctra. Zaragoza N-330a, Km 566, 22197 Cuarte, Huesca" },
 
   // Equipamientos
   { id: "plaza-toros", nombre: "Plaza de Toros", lat: 42.1385, lng: -0.4120, zona: "plaza-toros", direccion: "Plaza de Toros, 22003 Huesca" },

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, DM_Sans } from "next/font/google";
+import BottomNav from "@/components/BottomNav";
+import NotificacionesInit from "@/components/NotificacionesInit";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -74,10 +76,13 @@ export default function RootLayout({
       className={`${fraunces.variable} ${dmSans.variable} h-full`}
     >
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="icon" href="/icons/favicon.png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body className="min-h-full flex flex-col">
+        <NotificacionesInit />
         {children}
+        <BottomNav />
       </body>
     </html>
   );

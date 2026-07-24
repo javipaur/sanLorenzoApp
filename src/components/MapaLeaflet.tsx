@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Evento } from "@/types/evento";
-import { lugares, getLugarByNombre, getGoogleMapsUrl, getZonaById } from "@/data/zonas";
+import { lugares, zonas, getLugarByNombre, getGoogleMapsUrl, getZonaById } from "@/data/zonas";
 
 interface MapaLeafletProps {
   eventos: Evento[];
@@ -22,21 +22,22 @@ export default function MapaLeaflet({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const circlesRef = useRef<L.Circle[]>([]);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize map centered on Huesca
     const map = L.map(mapRef.current, {
       center: [42.1360, -0.4089],
       zoom: 14,
       zoomControl: true,
     });
 
-    // Add OpenStreetMap tiles
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    // CartoDB Positron - fondo blanco y limpio
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
       maxZoom: 19,
+      subdomains: "abcd",
     }).addTo(map);
 
     mapInstanceRef.current = map;
@@ -47,15 +48,67 @@ export default function MapaLeaflet({
     };
   }, []);
 
+  // Dibujar zonas como círculos semitransparentes (solo las que tienen eventos)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Clear existing markers
+    circlesRef.current.forEach((c) => c.remove());
+    circlesRef.current = [];
+
+    const zonaCentros: Record<string, { lat: number; lng: number; radio: number }> = {
+      "centro":             { lat: 42.1358, lng: -0.4085, radio: 200 },
+      "coso-bajo":          { lat: 42.1353, lng: -0.4073, radio: 150 },
+      "coso-alto":          { lat: 42.1344, lng: -0.4053, radio: 150 },
+      "san-lorenzo":        { lat: 42.1343, lng: -0.4062, radio: 200 },
+      "santiago":           { lat: 42.1315, lng: -0.4035, radio: 150 },
+      "encarnacion":        { lat: 42.1305, lng: -0.4020, radio: 150 },
+      "maria-auxiliadora":  { lat: 42.1290, lng: -0.4030, radio: 150 },
+      "santo-domingo":      { lat: 42.1330, lng: -0.4058, radio: 150 },
+      "perpetuo-socorro":   { lat: 42.1330, lng: -0.4040, radio: 150 },
+      "universidad":        { lat: 42.1395, lng: -0.4115, radio: 180 },
+      "plaza-toros":        { lat: 42.1385, lng: -0.4120, radio: 120 },
+      "palacio-congresos":  { lat: 42.1390, lng: -0.4135, radio: 120 },
+      "europa":             { lat: 42.1348, lng: -0.4112, radio: 150 },
+      "walqa":              { lat: 42.1078, lng: -0.4572, radio: 300 },
+      "extrarradio":        { lat: 42.1310, lng: -0.4010, radio: 150 },
+    };
+
+    // Zonas que tienen al menos un evento en la lista filtrada
+    const zonasConEventos = new Set<string>();
+    eventos.forEach((e) => {
+      const lugar = getLugarByNombre(e.lugar);
+      if (lugar) zonasConEventos.add(lugar.zona);
+    });
+
+    zonas.forEach((zona) => {
+      const c = zonaCentros[zona.id];
+      if (!c) return;
+
+      const tieneEventos = zonasConEventos.has(zona.id);
+      const isVisible = (!filtroZona || filtroZona === zona.id) && tieneEventos;
+
+      const circle = L.circle([c.lat, c.lng], {
+        radius: c.radio,
+        fillColor: zona.color,
+        fillOpacity: isVisible ? 0.15 : 0,
+        color: zona.color,
+        weight: isVisible ? 2 : 0,
+        opacity: isVisible ? 0.5 : 0,
+      }).addTo(map);
+
+      circlesRef.current.push(circle);
+    });
+  }, [eventos, filtroZona]);
+
+  // Dibujar marcadores de eventos
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    // Filter events
     let eventosFiltrados = eventos;
     if (filtroZona) {
       eventosFiltrados = eventosFiltrados.filter((e) => {
@@ -67,7 +120,6 @@ export default function MapaLeaflet({
       eventosFiltrados = eventosFiltrados.filter((e) => e.categoria === filtroCategoria);
     }
 
-    // Group events by location
     const eventosPorLugar = new Map<string, Evento[]>();
     eventosFiltrados.forEach((evento) => {
       const lugar = getLugarByNombre(evento.lugar);
@@ -78,74 +130,72 @@ export default function MapaLeaflet({
       eventosPorLugar.get(key)!.push(evento);
     });
 
-    // Create markers
     eventosPorLugar.forEach((eventosEnLugar, lugarKey) => {
       const lugar = lugares.find((l) => l.id === lugarKey);
       if (!lugar) return;
 
       const zona = getZonaById(lugar.zona);
 
-      // Create custom icon
       const icon = L.divIcon({
         className: "custom-marker",
         html: `
           <div style="
-            background-color: ${zona?.color || '#ef4444'};
-            width: 32px;
-            height: 32px;
+            background-color: ${zona?.color || '#007a5a'};
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            border: 2px solid white;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            border: 2.5px solid white;
           ">
             ${eventosEnLugar.length}
           </div>
         `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
       });
 
       const marker = L.marker([lugar.lat, lugar.lng], { icon }).addTo(map);
 
-      // Create popup content
       const popupContent = `
-        <div style="min-width: 200px; max-width: 300px;">
-          <h3 style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: ${zona?.color || '#ef4444'};">
+        <div style="min-width: 200px; max-width: 300px; font-family: system-ui, sans-serif;">
+          <h3 style="font-weight: 700; font-size: 14px; margin: 0 0 2px; color: ${zona?.color || '#007a5a'};">
             ${lugar.nombre}
           </h3>
-          <p style="font-size: 12px; color: #666; margin-bottom: 8px;">
+          <p style="font-size: 11px; color: #888; margin: 0 0 8px;">
             ${zona?.nombre || ''}
           </p>
-          <div style="max-height: 200px; overflow-y: auto;">
+          <div style="max-height: 180px; overflow-y: auto;">
             ${eventosEnLugar.slice(0, 5).map((e) => `
-              <div style="padding: 4px 0; border-bottom: 1px solid #eee; font-size: 12px;">
-                <span style="color: #666;">${e.hora}</span>
-                <span style="font-weight: 500;">${e.titulo}</span>
+              <div style="padding: 4px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px;">
+                <span style="color: ${zona?.color || '#007a5a'}; font-weight: 600;">${e.hora}</span>
+                <span style="color: #333;">${e.titulo}</span>
               </div>
             `).join('')}
             ${eventosEnLugar.length > 5 ? `
-              <p style="font-size: 11px; color: #999; margin-top: 4px;">
-                +${eventosEnLugar.length - 5} eventos más
+              <p style="font-size: 11px; color: #aaa; margin: 4px 0 0;">
+                +${eventosEnLugar.length - 5} más
               </p>
             ` : ''}
           </div>
-          <a 
+          <a
             href="${getGoogleMapsUrl(lugar.direccion || lugar.nombre)}"
             target="_blank"
             rel="noopener noreferrer"
             style="
               display: inline-block;
               margin-top: 8px;
-              padding: 4px 8px;
-              background-color: #3b82f6;
+              padding: 5px 10px;
+              background-color: #007a5a;
               color: white;
-              border-radius: 4px;
-              font-size: 12px;
+              border-radius: 6px;
+              font-size: 11px;
+              font-weight: 600;
               text-decoration: none;
             "
           >
@@ -158,7 +208,6 @@ export default function MapaLeaflet({
       markersRef.current.push(marker);
     });
 
-    // If there's a selected event, zoom to it
     if (eventoSeleccionado) {
       const lugar = getLugarByNombre(eventoSeleccionado.lugar);
       if (lugar) {
@@ -175,10 +224,13 @@ export default function MapaLeaflet({
   }, [eventos, eventoSeleccionado, filtroZona, filtroCategoria]);
 
   return (
-    <div 
-      ref={mapRef} 
-      className="w-full h-[500px] rounded-lg border border-gray-200"
-      style={{ zIndex: 0 }}
+    <div
+      ref={mapRef}
+      className="w-full h-full rounded-xl overflow-hidden"
+      style={{
+        zIndex: 0,
+        border: "1px solid var(--color-borde)",
+      }}
     />
   );
 }

@@ -98,10 +98,14 @@ export default async function DiaPage({ params }: PageProps) {
         </div>
       </main>
 
-      {/* Mobile favorites */}
+      {/* Spacer for BottomNav + mobile favorites */}
+      <div className="h-32 lg:h-24" />
+
+      {/* Mobile favorites - above BottomNav */}
       <div
-        className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white"
+        className="lg:hidden fixed left-0 right-0 p-4 bg-white"
         style={{
+          bottom: "90px",
           borderTop: "1px solid var(--color-borde)",
           boxShadow: "0 -4px 16px rgba(0,0,0,0.06)",
         }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Evento } from "@/types/evento";
 import { eventos, categorias } from "@/data/eventos";
@@ -35,43 +35,53 @@ interface EventoCercano extends Evento {
   distancia: number;
 }
 
+function getInitialGeoState(): {
+  pos: { lat: number; lng: number } | null;
+  loading: boolean;
+  error: boolean;
+  asked: boolean;
+} {
+  if (typeof window === "undefined") {
+    return { pos: null, loading: false, error: false, asked: false };
+  }
+  if (!navigator.geolocation) {
+    return { pos: null, loading: false, error: true, asked: false };
+  }
+  return { pos: null, loading: false, error: false, asked: false };
+}
+
 export default function EventosCercanos() {
-  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [geoState, setGeoState] = useState(getInitialGeoState);
 
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setError("Tu navegador no soporta geolocalización.");
-      return;
-    }
-
-    setLoading(true);
+  const pedirUbicacion = () => {
+    if (!navigator.geolocation) return;
+    setGeoState((s) => ({ ...s, loading: true, asked: true }));
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLoading(false);
-      },
-      () => {
-        setError("No se pudo obtener tu ubicación.");
-        setLoading(false);
-      },
+      (pos) =>
+        setGeoState({
+          pos: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+          loading: false,
+          error: false,
+          asked: true,
+        }),
+      () => setGeoState((s) => ({ ...s, pos: null, loading: false, error: true })),
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
-  }, []);
+  };
+
+  const { pos: userPos, loading, error } = geoState;
 
   const resultado = useMemo(() => {
     if (!userPos) return null;
 
     const { dia, mes, horaMinutos } = ahora();
 
-    // Eventos de HOY que aún no han pasado (o están ahora)
     const eventosHoy = eventos.filter((e) => e.dia === dia && e.mes === mes);
     const hoyCercanos: EventoCercano[] = [];
 
     for (const ev of eventosHoy) {
-      const finEv = horaAMinutos(ev.hora) + 90; // ~90 min estimado por evento
-      if (finEv < horaMinutos) continue; // ya pasó
+      const finEv = horaAMinutos(ev.hora) + 90;
+      if (finEv < horaMinutos) continue;
 
       const lugar = getLugarByNombre(ev.lugar);
       if (!lugar) continue;
@@ -83,22 +93,20 @@ export default function EventosCercanos() {
     }
 
     hoyCercanos.sort((a, b) => {
-      // Primero los que empiezan más pronto, luego por distancia
       const diffHora = horaAMinutos(a.hora) - horaAMinutos(b.hora);
       if (diffHora !== 0) return diffHora;
       return a.distancia - b.distancia;
     });
 
     if (hoyCercanos.length > 0) {
-      return { tipo: "hoy" as const, eventos: hoyCercanos.slice(0, 6) };
+      return { tipo: "hoy" as const, eventos: hoyCercanos.slice(0, 3) };
     }
 
-    // Si no hay hoy, buscar los próximos eventos cercanos
     const proximos: EventoCercano[] = [];
     for (const ev of eventos) {
       const totalMinEv = ev.dia * 1440 + ev.mes * 44000 + horaAMinutos(ev.hora);
       const totalMinAhora = dia * 1440 + mes * 44000 + horaMinutos;
-      if (totalMinEv <= totalMinAhora) continue; // ya pasó
+      if (totalMinEv <= totalMinAhora) continue;
 
       const lugar = getLugarByNombre(ev.lugar);
       if (!lugar) continue;
@@ -111,7 +119,7 @@ export default function EventosCercanos() {
 
     proximos.sort((a, b) => a.distancia - b.distancia);
     if (proximos.length > 0) {
-      return { tipo: "proximo" as const, eventos: proximos.slice(0, 6) };
+      return { tipo: "proximo" as const, eventos: proximos.slice(0, 3) };
     }
 
     return null;
@@ -119,100 +127,86 @@ export default function EventosCercanos() {
 
   if (loading) {
     return (
-      <div className="rounded-xl p-6 bg-white" style={{ border: "1px solid var(--color-borde)" }}>
-        <div className="flex items-center gap-3">
-          <span className="text-xl animate-pulse">📍</span>
-          <p className="text-sm" style={{ color: "var(--color-texto-secundario)" }}>
-            Buscando eventos cerca de ti...
-          </p>
-        </div>
+      <div className="flex items-center gap-2 text-white/60 text-sm">
+        <span className="animate-pulse">📍</span>
+        <span>Buscando eventos cerca...</span>
       </div>
     );
   }
 
-  if (error || !userPos || !resultado) return null;
+  if (error) {
+    return (
+      <div className="text-center py-3 px-4 rounded-xl bg-white/10">
+        <p className="text-xs text-white/50">
+          No se pudo obtener tu ubicación. Actívala en la configuración del navegador.
+        </p>
+      </div>
+    );
+  }
 
-  const titulo = resultado.tipo === "hoy"
-    ? "Ahora cerca de ti"
-    : "Próximos eventos cerca de ti";
+  if (!geoState.asked) {
+    return (
+      <button
+        onClick={pedirUbicacion}
+        className="w-full text-left p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
+      >
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-base">📍</span>
+          <span className="text-sm font-semibold text-white">Eventos cerca de ti</span>
+        </div>
+        <p className="text-[11px] text-white/50">
+          Activa tu ubicación para ver qué eventos tienes a menos de 5 km.
+        </p>
+      </button>
+    );
+  }
+
+  if (!userPos || !resultado) return null;
+
+  const esHoy = resultado.tipo === "hoy";
 
   return (
-    <div className="rounded-xl p-6 sm:p-8 bg-white" style={{ border: "1px solid var(--color-borde)" }}>
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-xl">{resultado.tipo === "hoy" ? "🔥" : "📍"}</span>
-        <h2
-          className="text-lg sm:text-xl font-bold"
-          style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
-        >
-          {titulo}
-        </h2>
+    <div className="mt-4 p-4 rounded-xl bg-white/15 backdrop-blur-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-base">{esHoy ? "🔥" : "📍"}</span>
+        <span className="text-sm font-semibold text-white">
+          {esHoy ? "Ahora cerca de ti" : "Próximos cerca de ti"}
+        </span>
       </div>
-
-      <div className="space-y-3">
+      <div className="space-y-2">
         {resultado.eventos.map((ev) => {
           const cat = categorias.find((c) => c.id === ev.categoria);
-          const mesNombre = ev.mes === 7 ? "jul" : "ago";
           const empiezaMin = horaAMinutos(ev.hora);
           const { horaMinutos: ahoraMin } = ahora();
           const minsRestan = empiezaMin - ahoraMin;
-          const empiezaEn = minsRestan > 0 ? `en ${minsRestan} min` : "ahora";
 
           return (
-            <div
+            <Link
               key={ev.id}
-              className="flex items-start gap-3 p-3 rounded-lg"
-              style={{ background: "var(--color-fondo)" }}
+              href={`/dia/${ev.mes === 7 ? "prelaurentis" : ev.dia < 9 ? "portico" : String(ev.dia)}`}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
             >
-              <div className="flex-shrink-0 w-14 text-center">
-                <span
-                  className="block text-xs font-bold"
-                  style={{ color: "var(--color-verde)" }}
-                >
-                  {ev.dia} {mesNombre}
-                </span>
-                <span
-                  className="block text-xs tabular-nums mt-0.5"
-                  style={{ color: "var(--color-texto-terciario)" }}
-                >
-                  {ev.hora}
-                </span>
-                {resultado.tipo === "hoy" && (
-                  <span
-                    className="block text-[10px] font-semibold mt-0.5"
-                    style={{ color: minsRestan <= 15 ? "var(--color-verde)" : "var(--color-texto-terciario)" }}
-                  >
-                    {empiezaEn}
+              <div className="flex-shrink-0 w-10 text-center">
+                <span className="block text-xs font-bold text-white">{ev.hora}</span>
+                {esHoy && minsRestan > 0 && (
+                  <span className="block text-[10px] text-white/60">
+                    en {minsRestan}m
                   </span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-xs">{cat?.emoji || "📌"}</span>
-                  <span
-                    className="text-xs font-medium px-1.5 py-0.5 rounded-full"
-                    style={{ backgroundColor: cat?.color || "#888", color: "white" }}
-                  >
-                    {cat?.nombre}
-                  </span>
-                </div>
-                <p className="text-sm font-semibold leading-snug truncate" style={{ color: "var(--color-texto)" }}>
-                  {ev.titulo}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-texto-terciario)" }}>
-                  📍 {ev.lugar} · {ev.distancia < 1 ? `${Math.round(ev.distancia * 1000)} m` : `${ev.distancia.toFixed(1)} km`}
+                <p className="text-xs font-semibold text-white truncate">{ev.titulo}</p>
+                <p className="text-[10px] text-white/50">
+                  {cat?.emoji} {ev.lugar}
                 </p>
               </div>
-              <Link
-                href={`/dia/${ev.mes === 7 ? "prelaurentis" : ev.dia < 9 ? "portico" : String(ev.dia)}`}
-                className="flex-shrink-0 text-xs font-medium px-2 py-1 rounded-full"
-                style={{
-                  background: "var(--color-verde)",
-                  color: "white",
-                }}
+              <span
+                className="flex-shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                style={{ backgroundColor: cat?.color || "#888", color: "white" }}
               >
-                Ver
-              </Link>
-            </div>
+                {cat?.nombre}
+              </span>
+            </Link>
           );
         })}
       </div>

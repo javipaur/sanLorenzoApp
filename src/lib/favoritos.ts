@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
 const FAVORITOS_KEY = "sanlorenzo-favoritos";
 
@@ -42,14 +42,17 @@ function setFavoritos(next: string[]) {
 export function useFavoritos() {
   const favoritos = useSyncExternalStore(subscribe, getSnapshot, () => []);
 
-  const toggleFavorito = (eventoId: string) => {
-    const next = favoritos.includes(eventoId)
-      ? favoritos.filter((id) => id !== eventoId)
-      : [...favoritos, eventoId];
+  const toggleFavorito = useCallback((eventoId: string) => {
+    const next = cacheFavoritos.includes(eventoId)
+      ? cacheFavoritos.filter((id) => id !== eventoId)
+      : [...cacheFavoritos, eventoId];
     setFavoritos(next);
-  };
+  }, []);
 
-  const esFavorito = (eventoId: string) => favoritos.includes(eventoId);
+  const esFavorito = useCallback(
+    (eventoId: string) => favoritos.includes(eventoId),
+    [favoritos]
+  );
 
-  return { favoritos, toggleFavorito, esFavorito, isLoaded: true };
+  return { favoritos, toggleFavorito, esFavorito };
 }

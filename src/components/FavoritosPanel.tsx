@@ -13,10 +13,7 @@ export default function FavoritosPanel({
   eventos,
   emptyBehavior = "message",
 }: FavoritosPanelProps) {
-  const { favoritos, isLoaded } = useFavoritos();
-
-  if (!isLoaded) return null;
-
+  const { favoritos } = useFavoritos();
   const eventosFavoritos = eventos.filter((e) => favoritos.includes(e.id));
 
   if (eventosFavoritos.length === 0) {

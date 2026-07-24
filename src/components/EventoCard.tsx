@@ -3,6 +3,12 @@
 import { Evento } from "@/types/evento";
 import { categorias } from "@/data/eventos";
 import { useFavoritos } from "@/lib/favoritos";
+import {
+  requestNotificationPermission,
+  shouldAskPermission,
+  programarNotificacionEvento,
+  cancelarNotificacionEvento,
+} from "@/lib/notificaciones";
 import { getLugarByNombre, getZonaById, getGoogleMapsUrl } from "@/data/zonas";
 
 interface EventoCardProps {
@@ -93,7 +99,18 @@ export default function EventoCard({ evento }: EventoCardProps) {
 
         {/* Favorite */}
         <button
-          onClick={() => toggleFavorito(evento.id)}
+          onClick={async () => {
+            const wasFav = favorito;
+            toggleFavorito(evento.id);
+            if (!wasFav) {
+              if (shouldAskPermission()) {
+                await requestNotificationPermission();
+              }
+              programarNotificacionEvento(evento);
+            } else {
+              cancelarNotificacionEvento(evento.id);
+            }
+          }}
           className="fav-btn self-start p-1.5 text-lg"
           style={{
             color: favorito ? "var(--color-verde-claro)" : "var(--color-texto-terciario)",
