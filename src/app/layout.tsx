@@ -19,6 +19,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://fiestassanlorenzo.javierpalacio.es"),
   title: "Fiestas de San Lorenzo 2026 | Huesca",
   description:
     "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca. Del 9 de julio al 15 de agosto: conciertos, tradiciones, toros, eventos infantiles y más.",
@@ -43,12 +44,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
     siteName: "Fiestas de San Lorenzo 2026",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Fiestas de San Lorenzo 2026 - Huesca",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Fiestas de San Lorenzo 2026 | Huesca",
     description:
       "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca. Del 9 de julio al 15 de agosto.",
+    images: ["/og-image.png"],
   },
   manifest: "/manifest.json",
   appleWebApp: {
