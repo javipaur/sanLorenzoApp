@@ -4,7 +4,6 @@ import type { Evento } from "@/types/evento";
 import { diasFiesta } from "@/data/eventos";
 
 const NOTIF_PERMISSION_KEY = "sanlorenzo-notif-perm";
-const SCHEDULED_KEY = "sanlorenzo-notif-scheduled";
 
 export function requestNotificationPermission(): Promise<NotificationPermission> {
   if (typeof window === "undefined" || !("Notification" in window)) {
@@ -46,21 +45,6 @@ function eventoFecha(evento: Evento): Date | null {
   return d;
 }
 
-function getScheduledIds(): string[] {
-  try {
-    const stored = localStorage.getItem(SCHEDULED_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
-function setScheduledIds(ids: string[]) {
-  try {
-    localStorage.setItem(SCHEDULED_KEY, JSON.stringify(ids));
-  } catch { /* */ }
-}
-
 const pendingTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function scheduleNotification(evento: Evento, delayMs: number) {
@@ -75,8 +59,6 @@ function scheduleNotification(evento: Evento, delayMs: number) {
       tag: `sanlorenzo-${evento.id}`,
     });
     pendingTimers.delete(evento.id);
-    const scheduled = getScheduledIds().filter((id) => id !== evento.id);
-    setScheduledIds(scheduled);
   }, delayMs);
 
   pendingTimers.set(evento.id, timer);
@@ -90,16 +72,13 @@ export function programarNotificacionEvento(evento: Evento) {
   if (!fechaEvento) return;
 
   const ahora = new Date();
-  const ANTES_MS = 15 * 60 * 1000;
+  const ANTES_MS =
+    Number(process.env.NEXT_PUBLIC_NOTIFICATION_TEST_DELAY) || 15 * 60 * 1000;
   const disparo = fechaEvento.getTime() - ANTES_MS;
   const delayMs = disparo - ahora.getTime();
 
   if (delayMs <= 0) return;
 
-  const scheduled = getScheduledIds();
-  if (scheduled.includes(evento.id)) return;
-
-  setScheduledIds([...scheduled, evento.id]);
   scheduleNotification(evento, delayMs);
 }
 
@@ -109,8 +88,6 @@ export function cancelarNotificacionEvento(eventoId: string) {
     clearTimeout(timer);
     pendingTimers.delete(eventoId);
   }
-  const scheduled = getScheduledIds().filter((id) => id !== eventoId);
-  setScheduledIds(scheduled);
 }
 
 export function programarNotificacionesFavoritos(favoritosIds: string[]) {

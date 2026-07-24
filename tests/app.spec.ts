@@ -322,6 +322,54 @@ test.describe("PWA", () => {
   }, { timeout: 20000 });
 });
 
+test.describe("Notificaciones", () => {
+  test("al marcar favorito se programa notificación y se dispara", async ({ page, context }) => {
+    await context.grantPermissions(["notifications"]);
+
+    // Fijar reloj a 9 agosto 2026, 08:59:50 (10s antes del evento a las 09:00)
+    await page.clock.install();
+    await page.clock.setSystemTime(new Date("2026-08-09T08:59:50"));
+
+    await page.goto("/dia/9");
+    await page.waitForSelector(".evento-card");
+
+    // Espiar constructor de Notification
+    const notificationCalls: { title: string; options: NotificationOptions }[] = [];
+    await page.evaluate(() => {
+      (window as any).__notifCalls = [];
+      const OrigNotif = window.Notification;
+      // eslint-disable-next-line no-global-assign
+      (window as any).Notification = function (
+        title: string,
+        options?: NotificationOptions
+      ) {
+        (window as any).__notifCalls.push({ title, options });
+        return new OrigNotif(title, options);
+      } as any;
+      (window as any).Notification.permission = OrigNotif.permission;
+      (window as any).Notification.requestPermission =
+        OrigNotif.requestPermission.bind(OrigNotif);
+    });
+
+    // Marcar primer evento como favorito
+    const favBtn = page.locator('button[aria-label="Añadir a favoritos"]').first();
+    await favBtn.click();
+    await page.waitForTimeout(200);
+
+    // Avanzar reloj 11 segundos (pasamos de 08:59:50 a 09:00:01)
+    // Con NEXT_PUBLIC_NOTIFICATION_TEST_DELAY=1000, el timer dispara a los 9s
+    await page.clock.runFor(11_000);
+    await page.waitForTimeout(500);
+
+    const calls = await page.evaluate(
+      () => (window as any).__notifCalls as { title: string; options: NotificationOptions }[]
+    );
+    expect(calls.length).toBe(1);
+    expect(calls[0].title).toContain("Colocación pañoleta");
+    expect(calls[0].options.body).toContain("09:00");
+  });
+});
+
 test.describe("SEO", () => {
   test("homepage tiene título correcto", async ({ page }) => {
     await page.goto("/");

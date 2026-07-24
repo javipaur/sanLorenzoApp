@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const PORT = process.env.PORT || 3000;
 const baseURL = `http://localhost:${PORT}`;
+const NOTIF_DELAY = process.env.NEXT_PUBLIC_NOTIFICATION_TEST_DELAY || "";
 
 export default defineConfig({
   testDir: "./tests",
@@ -21,7 +22,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev",
+    command: NOTIF_DELAY ? `NEXT_PUBLIC_NOTIFICATION_TEST_DELAY=${NOTIF_DELAY} npm run dev` : "npm run dev",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
