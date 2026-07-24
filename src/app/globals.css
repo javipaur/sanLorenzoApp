@@ -1,26 +1,153 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette: Fiestas de San Lorenzo - Huesca */
+  --color-verde: #007a5a;
+  --color-verde-claro: #3EA76D;
+  --color-verde-oscuro: #005c44;
+  --color-blanco: #ffffff;
+  --color-texto: #1A1A1A;
+  --color-texto-secundario: #555555;
+  --color-texto-terciario: #888888;
+  --color-fondo: #F7F7F5;
+  --color-borde: #E0DDD8;
+  --color-borde-claro: #EDEBE7;
+
+  --background: var(--color-blanco);
+  --foreground: var(--color-texto);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: "Fraunces", serif;
+  --font-body: "DM Sans", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1A1A1A;
+    --foreground: #F5F5F5;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Festival header */
+.festival-header {
+  background: linear-gradient(135deg, var(--color-verde) 0%, var(--color-verde-oscuro) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.festival-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(62, 167, 109, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* Day card */
+.dia-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dia-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 122, 90, 0.12);
+}
+.dia-card:focus-visible {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 2px;
+}
+
+/* Timeline */
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-verde);
+  background: var(--color-blanco);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* Event card */
+.evento-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  border: 1px solid var(--color-borde-claro);
+}
+.evento-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.evento-card:focus-within {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 2px;
+}
+
+/* Category badge */
+.cat-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+/* Favorite button */
+.fav-btn {
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.fav-btn:hover {
+  transform: scale(1.15);
+}
+.fav-btn:focus-visible {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Filter chip */
+.filter-chip {
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+}
+.filter-chip:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.filter-chip:focus-visible {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 2px;
+}
+.filter-chip-active {
+  border-color: currentColor;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth scroll */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
