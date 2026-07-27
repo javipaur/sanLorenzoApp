@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { diasFiesta, eventos } from "@/data/eventos";
+import { diasFiesta } from "@/data/eventos";
 import FiltroCategoriasWrapper from "@/components/FiltroCategoriasWrapper";
 import FavoritosPanel from "@/components/FavoritosPanel";
 
@@ -48,7 +48,7 @@ export default async function DiaPage({ params }: PageProps) {
             href="/"
             className="inline-flex items-center gap-1 text-sm mb-3 text-white/80 hover:text-white hover:underline"
           >
-            ← Volver al programa
+            &larr; Volver al programa
           </Link>
           <div className="flex items-baseline gap-3">
             {isNumericDay ? (
@@ -59,8 +59,11 @@ export default async function DiaPage({ params }: PageProps) {
                 {diaNum}
               </span>
             ) : (
-              <span className="text-4xl sm:text-5xl">
-                {dia.id === "prelaurentis" ? "🎭" : "🎪"}
+              <span
+                className="text-lg font-bold uppercase tracking-widest text-white/60"
+                style={{ fontFamily: "var(--font-body)" }}
+              >
+                {dia.id === "prelaurentis" ? "PRE" : "PORT"}
               </span>
             )}
             <div>
@@ -70,7 +73,7 @@ export default async function DiaPage({ params }: PageProps) {
               >
                 {isNumericDay ? (dia.nombre.split(" ").slice(1).join(" ") || dia.nombre) : dia.nombre}
               </h1>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-white/60">
                 {dia.fecha} &middot; {dia.eventos.length} eventos
               </p>
             </div>
@@ -92,7 +95,7 @@ export default async function DiaPage({ params }: PageProps) {
               className="sticky top-4 rounded-xl p-4 bg-white"
               style={{ border: "1px solid var(--color-borde)" }}
             >
-        <FavoritosPanel eventos={eventos} />
+        <FavoritosPanel eventos={dia.eventos} contexto="dia" />
             </div>
           </aside>
         </div>
@@ -110,7 +113,7 @@ export default async function DiaPage({ params }: PageProps) {
           boxShadow: "0 -4px 16px rgba(0,0,0,0.06)",
         }}
       >
-        <FavoritosPanel eventos={eventos} emptyBehavior="hide" />
+        <FavoritosPanel eventos={dia.eventos} emptyBehavior="hide" />
       </div>
     </div>
   );

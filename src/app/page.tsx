@@ -42,50 +42,35 @@ export default function Home() {
 
   const faseActual = getFaseActual();
   const totalEventos = eventos.length;
-  const totalDias = 37;
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Hero ── */}
-      <header className="festival-header text-white py-14 px-4 sm:py-20">
+      <header className="festival-header text-white py-16 px-4 sm:py-24">
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <p className="text-sm sm:text-base font-medium tracking-[0.2em] uppercase mb-4 text-white/80">
+          <div className="hero-date-strip mb-6">
             Huesca &middot; Julio – Agosto 2026
-          </p>
+          </div>
           <h1
-            className="text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] mb-4"
+            className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Fiestas de
             <br />
-            <span className="text-white">San Lorenzo</span>
+            <span className="italic">San Lorenzo</span>
           </h1>
-          <p className="text-base sm:text-lg mt-4 text-white/75">
-            Programa completo · Del 9 de julio al 15 de agosto
+          <p className="text-sm sm:text-base mt-6 text-white/60 max-w-sm mx-auto leading-relaxed">
+            Programa completo de las fiestas.
+            <br />
+            Del 9 de julio al 15 de agosto.
           </p>
-
-          {/* Stat badges */}
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
-            <span className="hero-stat">
-              <span style={{ fontSize: "1rem" }}>🎉</span>
-              {totalEventos}+ eventos
-            </span>
-            <span className="hero-stat">
-              <span style={{ fontSize: "1rem" }}>📅</span>
-              {totalDias} días
-            </span>
-            <span className="hero-stat">
-              <span style={{ fontSize: "1rem" }}>📍</span>
-              15 zonas
-            </span>
-          </div>
 
           {/* Search */}
           <div className="mt-8 max-w-md mx-auto">
             <BuscadorEventos />
           </div>
 
-          <div className="mt-6 max-w-sm mx-auto">
+          <div className="mt-5 max-w-sm mx-auto">
             <EventosCercanos />
           </div>
         </div>
@@ -96,12 +81,10 @@ export default function Home() {
 
         {/* === TIMELINE: Las 3 fases === */}
         <section className="max-w-4xl mx-auto w-full px-4 py-10 sm:py-14">
-          <h2
-            className="text-xl sm:text-2xl font-bold mb-8"
-            style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
-          >
-            El programa en 3 fases
-          </h2>
+          <div className="section-header">
+            <div className="section-header-line" />
+            <h2 className="section-header-title">El programa en 3 fases</h2>
+          </div>
 
           <div className="phase-timeline">
             {/* Prelaurentis */}
@@ -113,7 +96,6 @@ export default function Home() {
                     style={{ border: "1px solid var(--color-borde)" }}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">🎉</span>
                       <h3
                         className="text-lg sm:text-xl font-bold"
                         style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
@@ -125,7 +107,7 @@ export default function Home() {
                       )}
                     </div>
                     <p className="text-sm mb-2" style={{ color: "var(--color-texto-secundario)" }}>
-                      {prelaurentis.fecha} · {prelaurentis.eventos.length} eventos
+                      {prelaurentis.fecha} &middot; {prelaurentis.eventos.length} eventos
                     </p>
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {prelaurentis.eventos.slice(0, 2).map((e) => (
@@ -138,7 +120,7 @@ export default function Home() {
                       className="text-xs font-semibold group-hover:underline"
                       style={{ color: "var(--color-verde-oscuro)" }}
                     >
-                      Ver programa →
+                      Ver programa &rarr;
                     </span>
                   </div>
                 </Link>
@@ -154,7 +136,6 @@ export default function Home() {
                     style={{ border: "1px solid var(--color-borde)" }}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">🐂</span>
                       <h3
                         className="text-lg sm:text-xl font-bold"
                         style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
@@ -166,7 +147,7 @@ export default function Home() {
                       )}
                     </div>
                     <p className="text-sm mb-2" style={{ color: "var(--color-texto-secundario)" }}>
-                      {portico.fecha} · {portico.eventos.length} eventos
+                      {portico.fecha} &middot; {portico.eventos.length} eventos
                     </p>
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {portico.eventos.slice(0, 2).map((e) => (
@@ -179,7 +160,7 @@ export default function Home() {
                       className="text-xs font-semibold group-hover:underline"
                       style={{ color: "var(--color-verde-oscuro)" }}
                     >
-                      Ver programa →
+                      Ver programa &rarr;
                     </span>
                   </div>
                 </Link>
@@ -193,7 +174,6 @@ export default function Home() {
                 style={{ background: "var(--color-verde)", color: "white" }}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">🔥</span>
                   <h3
                     className="text-lg sm:text-xl font-bold"
                     style={{ fontFamily: "var(--font-display)" }}
@@ -205,10 +185,10 @@ export default function Home() {
                   )}
                 </div>
                 <p className="text-sm opacity-80 mb-1">
-                  9 – 15 agosto · {fiestas.reduce((s, d) => s + d.eventos.length, 0)}+ eventos
+                  9 &ndash; 15 agosto &middot; {fiestas.reduce((s, d) => s + d.eventos.length, 0)}+ eventos
                 </p>
                 <p className="text-xs opacity-60">
-                  La semana grande: música, tradiciones, toros, procession...
+                  La semana grande: música, tradiciones, toros, procesión...
                 </p>
               </div>
             </div>
@@ -218,13 +198,10 @@ export default function Home() {
         {/* === GRID DE DÍAS === */}
         <section className="section-alt">
           <div className="max-w-4xl mx-auto w-full px-4 py-10 sm:py-14">
-            <div className="flex items-center justify-between mb-6">
-              <h2
-                className="text-xl sm:text-2xl font-bold"
-                style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
-              >
-                📅 Agenda por días
-              </h2>
+            <div className="section-header">
+              <div className="section-header-line" />
+              <h2 className="section-header-title">Agenda por días</h2>
+              <span className="section-header-count">7 días</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -240,11 +217,9 @@ export default function Home() {
                   <Link
                     key={dia.id}
                     href={`/dia/${dia.id}`}
-                    className="dia-card block rounded-xl p-5 sm:p-6 bg-white"
+                    className={`dia-card block rounded-xl p-5 sm:p-6 bg-white ${esHoy ? "dia-card-hoy" : ""}`}
                     style={{
-                      border: esHoy
-                        ? "2px solid var(--color-verde)"
-                        : "1px solid var(--color-borde)",
+                      border: esHoy ? undefined : "1px solid var(--color-borde)",
                     }}
                   >
                     <div className="flex items-baseline gap-2">
@@ -270,7 +245,7 @@ export default function Home() {
                       className="block text-xs mt-2 tabular-nums"
                       style={{ color: "var(--color-texto-terciario)" }}
                     >
-                      {rangoHoras} · {dia.eventos.length} eventos
+                      {rangoHoras} &middot; {dia.eventos.length} eventos
                     </span>
                     {destacado && (
                       <div className="featured-pill mt-2 block">
@@ -297,12 +272,13 @@ export default function Home() {
               }}
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <span
-                  className="text-4xl flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center"
-                  style={{ background: "rgba(0,122,90,0.1)" }}
-                >
-                  🗺️
-                </span>
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: "var(--color-verde)", color: "white" }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                    <line x1="8" y1="2" x2="8" y2="18" />
+                    <line x1="16" y1="6" x2="16" y2="22" />
+                  </svg>
+                </div>
                 <div className="flex-1">
                   <h3
                     className="text-lg font-bold mb-1"
@@ -317,7 +293,7 @@ export default function Home() {
                     className="inline-block mt-2 text-xs font-semibold group-hover:underline"
                     style={{ color: "var(--color-verde-oscuro)" }}
                   >
-                    Abrir mapa interactivo →
+                    Abrir mapa interactivo &rarr;
                   </span>
                 </div>
               </div>
@@ -329,18 +305,16 @@ export default function Home() {
         <section className="section-alt">
           <div className="max-w-4xl mx-auto w-full px-4 py-10 sm:py-14">
             <div className="flex items-center justify-between mb-6">
-              <h2
-                className="text-xl sm:text-2xl font-bold"
-                style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
-              >
-                🎵 Programación Musical
-              </h2>
+              <div className="section-header" style={{ marginBottom: 0 }}>
+                <div className="section-header-line" />
+                <h2 className="section-header-title">Programación Musical</h2>
+              </div>
               <Link
                 href="/conciertos"
                 className="text-xs font-semibold hover:underline"
                 style={{ color: "var(--color-verde-oscuro)" }}
               >
-                Ver todo →
+                Ver todo &rarr;
               </Link>
             </div>
 
@@ -350,7 +324,7 @@ export default function Home() {
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-1 h-5 rounded-full" style={{ background: "var(--color-verde)" }} />
                   <h3 className="text-sm font-bold" style={{ color: "var(--color-texto)" }}>
-                    🎤 Conciertos
+                    Conciertos
                   </h3>
                 </div>
                 <div className="space-y-2">
@@ -389,7 +363,7 @@ export default function Home() {
                             {ev.titulo}
                           </h4>
                           <p className="text-[10px] truncate" style={{ color: "var(--color-texto-terciario)" }}>
-                            📍 {ev.lugar}
+                            {ev.lugar}
                           </p>
                         </div>
                       </Link>
@@ -402,7 +376,7 @@ export default function Home() {
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-1 h-5 rounded-full" style={{ background: "#8b5cf6" }} />
                   <h3 className="text-sm font-bold" style={{ color: "var(--color-texto)" }}>
-                    🪗 Orquestas y Verbenas
+                    Orquestas y Verbenas
                   </h3>
                 </div>
                 <div className="space-y-2">
@@ -436,7 +410,7 @@ export default function Home() {
                             {ev.titulo}
                           </h4>
                           <p className="text-[10px] truncate" style={{ color: "var(--color-texto-terciario)" }}>
-                            📍 {ev.lugar}
+                            {ev.lugar}
                           </p>
                         </div>
                       </Link>
@@ -454,7 +428,7 @@ export default function Home() {
                 color: "var(--color-verde-oscuro)",
               }}
             >
-              Ver los 118 eventos musicales →
+              Ver los {totalEventos} eventos musicales &rarr;
             </Link>
           </div>
         </section>
@@ -467,13 +441,13 @@ export default function Home() {
       >
         <div className="max-w-4xl mx-auto">
           <p
-            className="text-base font-bold mb-2"
+            className="text-base font-bold mb-1"
             style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
           >
             Fiestas de San Lorenzo 2026
           </p>
           <p className="text-xs mb-4" style={{ color: "var(--color-texto-terciario)" }}>
-            Huesca · Del 9 de julio al 15 de agosto
+            Huesca &middot; Del 9 de julio al 15 de agosto
           </p>
           <div className="flex justify-center gap-4 text-xs mb-4">
             <Link href="/" className="hover:underline" style={{ color: "var(--color-verde)" }}>
@@ -508,7 +482,7 @@ export default function Home() {
             className="text-xs mt-4 text-center text-pretty"
             style={{ color: "var(--color-texto-terciario)" }}
           >
-            © 2026{" "}
+            &copy; 2026{" "}
             <a
               href="https://javierpalacio.es"
               target="_blank"

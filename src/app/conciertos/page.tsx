@@ -133,6 +133,7 @@ function EventoMusical({
   const tag = subtypeTag(ev);
   const lugar = getLugarByNombre(ev.lugar);
   const mapsUrl = getGoogleMapsUrl(lugar?.direccion || ev.lugar);
+  const [animKey, setAnimKey] = useState(0);
 
   return (
     <div
@@ -178,7 +179,7 @@ function EventoMusical({
             className="text-[11px]"
             style={{ color: "var(--color-texto-terciario)" }}
           >
-            📍 {ev.lugar}
+            {ev.lugar}
           </span>
         </div>
         {/* Actions */}
@@ -207,8 +208,9 @@ function EventoMusical({
 
       {/* Favorite */}
       <button
-        onClick={(e) => { e.stopPropagation(); onToggleFav(); }}
-        className="fav-btn self-start p-1 text-lg flex-shrink-0"
+        onClick={(e) => { e.stopPropagation(); setAnimKey((k) => k + 1); onToggleFav(); }}
+        key={animKey}
+        className="fav-btn fav-btn-active self-start p-1 text-lg flex-shrink-0"
         style={{ color: esFavorito ? "var(--color-verde-claro)" : "var(--color-texto-terciario)" }}
         aria-label={esFavorito ? "Quitar de favoritos" : "Añadir a favoritos"}
       >
@@ -257,16 +259,16 @@ export default function ConciertosPage() {
             href="/"
             className="inline-flex items-center gap-1 text-sm mb-3 text-white/80 hover:text-white hover:underline"
           >
-            ← Volver al programa
+            &larr; Volver al programa
           </Link>
           <h1
             className="text-2xl sm:text-3xl font-bold"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            🎵 Programación Musical
+            Programación Musical
           </h1>
-          <p className="text-sm mt-1 text-white/70">
-            {totalMusica} eventos · {diaSeleccionado === "todos" ? "todos los días" : `día ${diaSeleccionado}`}
+          <p className="text-sm mt-1 text-white/60">
+            {totalMusica} eventos &middot; {diaSeleccionado === "todos" ? "todos los días" : `día ${diaSeleccionado}`}
           </p>
         </div>
       </header>
@@ -393,10 +395,9 @@ export default function ConciertosPage() {
 
         {grand.length === 0 && folk.length === 0 && (
           <div className="text-center py-12">
-            <span className="text-3xl block mb-3">🔇</span>
             <p
               className="text-sm font-semibold"
-              style={{ color: "var(--color-texto-secundario)" }}
+              style={{ fontFamily: "var(--font-display)", color: "var(--color-texto-secundario)" }}
             >
               No hay eventos musicales para este día
             </p>

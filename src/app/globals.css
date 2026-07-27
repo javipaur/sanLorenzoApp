@@ -34,9 +34,10 @@ body {
 
 /* ── Festival header ── */
 .festival-header {
-  background: linear-gradient(135deg, var(--color-verde) 0%, var(--color-verde-oscuro) 100%);
+  background: var(--color-verde-oscuro);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .festival-header::before {
@@ -44,24 +45,40 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(62, 167, 109, 0.25) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+    radial-gradient(ellipse at 20% 50%, rgba(62, 167, 109, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 120%, rgba(0, 92, 68, 0.8) 0%, transparent 60%);
   pointer-events: none;
 }
 
-/* ── Hero stat badge ── */
-.hero-stat {
+.festival-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── Hero date strip ── */
+.hero-date-strip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.8rem;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
   font-weight: 600;
-  color: white;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-date-strip::before,
+.hero-date-strip::after {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* ── Phase timeline (vertical) ── */
@@ -131,14 +148,39 @@ body {
 /* ── Day card ── */
 .dia-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.dia-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--color-verde);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 .dia-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0, 122, 90, 0.12);
 }
+.dia-card:hover::before {
+  opacity: 1;
+}
 .dia-card:focus-visible {
   outline: 2px solid var(--color-verde);
   outline-offset: 2px;
+}
+
+.dia-card-hoy {
+  background: linear-gradient(135deg, rgba(0, 122, 90, 0.04) 0%, rgba(62, 167, 109, 0.06) 100%);
+}
+.dia-card-hoy::before {
+  opacity: 1;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--color-verde-claro), var(--color-verde));
 }
 
 /* ── Event card ── */
@@ -177,6 +219,18 @@ body {
   outline: 2px solid var(--color-verde);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+@keyframes fav-bounce {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.35); }
+  50% { transform: scale(0.9); }
+  75% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.fav-btn-active {
+  animation: fav-bounce 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 /* ── Filter chip ── */
@@ -279,15 +333,51 @@ body {
   background: var(--color-fondo);
 }
 
+/* ── Section header (no emoji) ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.section-header-line {
+  width: 3px;
+  height: 24px;
+  border-radius: 2px;
+  background: var(--color-verde);
+  flex-shrink: 0;
+}
+
+.section-header-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  line-height: 1.2;
+}
+
+.section-header-count {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-texto-terciario);
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde-claro);
+  padding: 2px 8px;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
 /* ── Featured event pill ── */
 .featured-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: var(--color-fondo);
-  border: 1px solid var(--color-borde-claro);
-  border-radius: 999px;
-  padding: 3px 10px;
+  background: rgba(0, 122, 90, 0.05);
+  border: 1px solid rgba(0, 122, 90, 0.1);
+  border-radius: 6px;
+  padding: 3px 8px;
   font-size: 0.7rem;
   color: var(--color-texto-secundario);
   max-width: 100%;
@@ -685,6 +775,17 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Timeline dot (day page) ── */
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-borde);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--color-borde);
+  flex-shrink: 0;
 }
 
 /* ── Reduced motion ── */

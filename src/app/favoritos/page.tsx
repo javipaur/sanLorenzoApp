@@ -28,7 +28,7 @@ export default function FavoritosPage() {
   }, [favoritos]);
 
   const agrupados = useMemo(() => {
-    const map = new Map<string, { label: string; eventos: typeof eventosFavoritos }>();
+    const map = new Map<string, { label: string; eventos: typeof eventosFavoritos; orden: number }>();
 
     for (const ev of eventosFavoritos) {
       const key = `${ev.mes}-${ev.dia}`;
@@ -36,15 +36,19 @@ export default function FavoritosPage() {
         const diaNum = ev.dia;
         const nombreDia = diasSemana[diaNum] || "";
         const mes = mesLabel[ev.mes] || "";
+        const label = ev.mes === 7
+          ? `${diaNum} ${mes}`
+          : `${nombreDia} ${diaNum} ${mes}`;
         map.set(key, {
-          label: ev.mes === 8 ? `${nombreDia} ${diaNum} ${mes}` : `Prelaurentis – ${mes}`,
+          label,
           eventos: [],
+          orden: ev.mes * 100 + ev.dia,
         });
       }
       map.get(key)!.eventos.push(ev);
     }
 
-    return Array.from(map.values());
+    return Array.from(map.values()).sort((a, b) => a.orden - b.orden);
   }, [eventosFavoritos]);
 
   return (
@@ -56,15 +60,15 @@ export default function FavoritosPage() {
             href="/"
             className="inline-flex items-center gap-1 text-sm mb-3 text-white/80 hover:text-white hover:underline"
           >
-            ← Volver al programa
+            &larr; Volver al programa
           </Link>
           <h1
             className="text-2xl sm:text-3xl font-bold"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            ⭐ Mis Favoritos
+            Mis Favoritos
           </h1>
-          <p className="text-sm mt-1 text-white/70">
+          <p className="text-sm mt-1 text-white/60">
             {eventosFavoritos.length} eventos guardados
           </p>
         </div>
@@ -74,7 +78,9 @@ export default function FavoritosPage() {
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
         {eventosFavoritos.length === 0 ? (
           <div className="text-center py-16">
-            <span className="text-4xl block mb-4">☆</span>
+            <span className="text-4xl block mb-4 font-black" style={{ fontFamily: "var(--font-display)", color: "var(--color-borde)" }}>
+              ☆
+            </span>
             <p
               className="text-lg font-semibold mb-2"
               style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}

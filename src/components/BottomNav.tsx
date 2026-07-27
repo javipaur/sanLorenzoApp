@@ -15,10 +15,14 @@ export default function BottomNav() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
+  const isMapa = pathname.startsWith("/mapa");
+
   useEffect(() => {
     const timer = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(timer);
   }, []);
+
+  if (isMapa) return null;
 
   return (
     <nav

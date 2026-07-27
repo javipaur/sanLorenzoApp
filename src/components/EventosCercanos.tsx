@@ -128,7 +128,12 @@ export default function EventosCercanos() {
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-white/60 text-sm">
-        <span className="animate-pulse">📍</span>
+        <span className="animate-pulse">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+        </span>
         <span>Buscando eventos cerca...</span>
       </div>
     );
@@ -151,7 +156,10 @@ export default function EventosCercanos() {
         className="w-full text-left p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
       >
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-base">📍</span>
+          <svg className="w-4 h-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
           <span className="text-sm font-semibold text-white">Eventos cerca de ti</span>
         </div>
         <p className="text-[11px] text-white/50">
@@ -168,7 +176,6 @@ export default function EventosCercanos() {
   return (
     <div className="mt-4 p-4 rounded-xl bg-white/15 backdrop-blur-sm">
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-base">{esHoy ? "🔥" : "📍"}</span>
         <span className="text-sm font-semibold text-white">
           {esHoy ? "Ahora cerca de ti" : "Próximos cerca de ti"}
         </span>

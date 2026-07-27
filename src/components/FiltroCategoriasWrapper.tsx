@@ -10,9 +10,9 @@ interface FiltroCategoriasWrapperProps {
 }
 
 const momentos = [
-  { id: "manana", nombre: "Mañana", emoji: "🌅" },
-  { id: "tarde", nombre: "Tarde", emoji: "☀️" },
-  { id: "noche", nombre: "Noche", emoji: "🌙" },
+  { id: "manana", nombre: "Mañana" },
+  { id: "tarde", nombre: "Tarde" },
+  { id: "noche", nombre: "Noche" },
 ];
 
 export default function FiltroCategoriasWrapper({
@@ -50,9 +50,13 @@ export default function FiltroCategoriasWrapper({
             <div key={momento.id} className="mb-2 last:mb-0">
               {/* Section header */}
               <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center w-10">
-                  <span className="text-xl">{momento.emoji}</span>
-                </div>
+                <div
+                  className="w-1 h-6 rounded-full"
+                  style={{
+                    background: momento.id === "manana" ? "var(--color-verde)" :
+                                momento.id === "tarde" ? "#f59e0b" : "#6366f1"
+                  }}
+                />
                 <h2
                   className="text-lg font-bold"
                   style={{
@@ -101,10 +105,9 @@ export default function FiltroCategoriasWrapper({
       {/* No events */}
       {eventosFiltrados.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">🔍</p>
           <p
             className="text-lg font-semibold mb-1"
-            style={{ color: "var(--color-texto-secundario)" }}
+            style={{ fontFamily: "var(--font-display)", color: "var(--color-texto-secundario)" }}
           >
             Sin resultados
           </p>

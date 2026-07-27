@@ -7,11 +7,13 @@ import EventoCard from "./EventoCard";
 interface FavoritosPanelProps {
   eventos: Evento[];
   emptyBehavior?: "hide" | "message";
+  contexto?: "dia" | "global";
 }
 
 export default function FavoritosPanel({
   eventos,
   emptyBehavior = "message",
+  contexto = "global",
 }: FavoritosPanelProps) {
   const { favoritos } = useFavoritos();
   const eventosFavoritos = eventos.filter((e) => favoritos.includes(e.id));
@@ -19,14 +21,20 @@ export default function FavoritosPanel({
   if (eventosFavoritos.length === 0) {
     if (emptyBehavior === "hide") return null;
 
+    const mensaje = contexto === "dia"
+      ? "Guarda eventos de este día pulsando la estrella."
+      : "Pulsa la estrella de un evento para guardarlo aquí.";
+
     return (
       <div className="text-center py-8">
-        <p className="text-3xl mb-2">⭐</p>
+        <p className="text-3xl mb-2 font-black" style={{ fontFamily: "var(--font-display)", color: "var(--color-borde)" }}>
+          ☆
+        </p>
         <p className="text-sm font-semibold mb-1" style={{ color: "var(--color-texto-secundario)" }}>
           Sin favoritos aún
         </p>
         <p className="text-xs" style={{ color: "var(--color-texto-terciario)" }}>
-          Pulsa la estrella de un evento para guardarlo aquí.
+          {mensaje}
         </p>
       </div>
     );

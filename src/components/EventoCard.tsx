@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { Evento } from "@/types/evento";
 import { categorias } from "@/data/eventos";
 import { useFavoritos } from "@/lib/favoritos";
@@ -19,10 +20,25 @@ export default function EventoCard({ evento }: EventoCardProps) {
   const { esFavorito, toggleFavorito } = useFavoritos();
   const favorito = esFavorito(evento.id);
   const categoria = categorias.find((c) => c.id === evento.categoria);
+  const [animKey, setAnimKey] = useState(0);
 
   const lugar = getLugarByNombre(evento.lugar);
   const zona = lugar ? getZonaById(lugar.zona) : null;
   const googleMapsUrl = getGoogleMapsUrl(lugar?.direccion || evento.lugar);
+
+  const handleToggle = useCallback(async () => {
+    const wasFav = favorito;
+    toggleFavorito(evento.id);
+    setAnimKey((k) => k + 1);
+    if (!wasFav) {
+      if (shouldAskPermission()) {
+        await requestNotificationPermission();
+      }
+      programarNotificacionEvento(evento);
+    } else {
+      cancelarNotificacionEvento(evento.id);
+    }
+  }, [favorito, evento, toggleFavorito]);
 
   return (
     <div className="evento-card rounded-lg p-4 bg-white">
@@ -77,7 +93,7 @@ export default function EventoCard({ evento }: EventoCardProps) {
           )}
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <span className="text-xs" style={{ color: "var(--color-texto-terciario)" }}>
-              📍 {evento.lugar}
+              {evento.lugar}
             </span>
             <a
               href={googleMapsUrl}
@@ -99,19 +115,9 @@ export default function EventoCard({ evento }: EventoCardProps) {
 
         {/* Favorite */}
         <button
-          onClick={async () => {
-            const wasFav = favorito;
-            toggleFavorito(evento.id);
-            if (!wasFav) {
-              if (shouldAskPermission()) {
-                await requestNotificationPermission();
-              }
-              programarNotificacionEvento(evento);
-            } else {
-              cancelarNotificacionEvento(evento.id);
-            }
-          }}
-          className="fav-btn self-start p-1.5 text-lg"
+          onClick={handleToggle}
+          key={animKey}
+          className={`fav-btn fav-btn-active self-start p-1.5 text-lg`}
           style={{
             color: favorito ? "var(--color-verde-claro)" : "var(--color-texto-terciario)",
           }}
