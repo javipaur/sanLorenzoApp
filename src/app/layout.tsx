@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fiestas de San Lorenzo 2026 | Huesca",
     description:
-      "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca. Del 9 de julio al 15 de agosto.",
+      "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca. Del 9 de julio al 15 de agosto: conciertos, tradiciones, toros, eventos infantiles y más.",
     type: "website",
     locale: "es_ES",
     siteName: "Fiestas de San Lorenzo 2026",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Fiestas de San Lorenzo 2026 | Huesca",
     description:
-      "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca. Del 9 de julio al 15 de agosto.",
+      "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca. Del 9 de julio al 15 de agosto: conciertos, tradiciones, toros, eventos infantiles y más.",
     images: ["/og-image.png"],
   },
   manifest: "/manifest.json",

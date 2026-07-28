@@ -103,7 +103,7 @@ export default function EventoCard({ evento }: EventoCardProps) {
               style={{ color: "var(--color-verde-oscuro)" }}
               onClick={(e) => e.stopPropagation()}
             >
-              Cómo llegar
+              Cómo llegar →
             </a>
           </div>
           {evento.organizador && (

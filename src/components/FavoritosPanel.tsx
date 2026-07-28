@@ -31,7 +31,7 @@ export default function FavoritosPanel({
           ☆
         </p>
         <p className="text-sm font-semibold mb-1" style={{ color: "var(--color-texto-secundario)" }}>
-          Sin favoritos aún
+          No tienes favoritos aún
         </p>
         <p className="text-xs" style={{ color: "var(--color-texto-terciario)" }}>
           {mensaje}

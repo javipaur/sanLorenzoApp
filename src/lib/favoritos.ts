@@ -64,5 +64,12 @@ export function useFavoritos() {
     [favoritos]
   );
 
-  return { favoritos, toggleFavorito, esFavorito };
+  const tieneFavoritos = favoritos.length > 0;
+
+  const tieneFavoritosEn = useCallback(
+    (eventos: { id: string }[]) => eventos.some((e) => favoritos.includes(e.id)),
+    [favoritos]
+  );
+
+  return { favoritos, toggleFavorito, esFavorito, tieneFavoritos, tieneFavoritosEn };
 }

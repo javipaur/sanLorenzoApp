@@ -3,6 +3,7 @@ import Link from "next/link";
 import { diasFiesta } from "@/data/eventos";
 import FiltroCategoriasWrapper from "@/components/FiltroCategoriasWrapper";
 import FavoritosPanel from "@/components/FavoritosPanel";
+import MobileFavoritesBar from "@/components/MobileFavoritesBar";
 
 interface PageProps {
   params: Promise<{ dia: string }>;
@@ -105,16 +106,7 @@ export default async function DiaPage({ params }: PageProps) {
       <div className="h-32 lg:h-24" />
 
       {/* Mobile favorites - above BottomNav */}
-      <div
-        className="lg:hidden fixed left-0 right-0 p-4 bg-white"
-        style={{
-          bottom: "90px",
-          borderTop: "1px solid var(--color-borde)",
-          boxShadow: "0 -4px 16px rgba(0,0,0,0.06)",
-        }}
-      >
-        <FavoritosPanel eventos={dia.eventos} emptyBehavior="hide" />
-      </div>
+      <MobileFavoritesBar eventos={dia.eventos} />
     </div>
   );
 }
