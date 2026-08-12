@@ -3,6 +3,8 @@ import { diasFiesta, eventos } from "@/data/eventos";
 import EventosCercanos from "@/components/EventosCercanos";
 import BuscadorEventos from "@/components/BuscadorEventos";
 import AgendaDiasGrid from "@/components/AgendaDiasGrid";
+import InstallPWA from "@/components/InstallPWA";
+import { APP_VERSION } from "@/lib/version";
 
 function getFaseActual(): string {
   const now = new Date();
@@ -53,6 +55,10 @@ export default function Home() {
 
           <div className="mt-5 max-w-sm mx-auto">
             <EventosCercanos />
+          </div>
+
+          <div className="mt-5 max-w-sm mx-auto">
+            <InstallPWA variant="hero" />
           </div>
         </div>
       </header>
@@ -375,6 +381,9 @@ export default function Home() {
             <Link href="/mapa" className="hover:underline" style={{ color: "var(--color-verde)" }}>
               Mapa
             </Link>
+            <Link href="/info" className="hover:underline" style={{ color: "var(--color-verde)" }}>
+              Información
+            </Link>
             <a
               href="https://www.fiestassanlorenzo.es"
               target="_blank"
@@ -422,6 +431,9 @@ export default function Home() {
               <path d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037.033l.034-.03a6 6 0 0 1 4.733-1.44l.246.036a6 6 0 0 1 3.364 10.008l-.18.185l-.048.041l-7.45 7.379a1 1 0 0 1-1.313.082l-.094-.082l-7.493-7.422a6 6 0 0 1 3.176-10.215z" />
             </svg>
             en Huesca
+          </p>
+          <p className="text-[10px] mt-2" style={{ color: "var(--color-texto-terciario)" }}>
+            v{APP_VERSION}
           </p>
         </div>
       </footer>

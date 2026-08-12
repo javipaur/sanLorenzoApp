@@ -14,7 +14,7 @@ Agenda digital de las Fiestas de San Lorenzo 2026 - Huesca. Web en Next.js con:
 - **Lenguaje:** TypeScript
 - **Estilos:** Tailwind CSS v4
 - **PWA:** next-pwa
-- **Analytics:** Google Analytics 4 (GTM tag en `Analytics.tsx`, helpers en `lib/analytics.ts`)
+- **Analytics:** Google Analytics 4 (GTM tag en `Analytics.tsx`, helpers en `lib/analytics.ts`). Estadísticas de uso vía GA4 Data API (`@google-analytics/data`) en `/api/stats`
 - **Feedback:** Formulario + API `/api/feedback` con envío por SMTP (nodemailer)
 - **Storage local:** `localStorage` para favoritos (no hay backend de datos)
 
@@ -40,8 +40,13 @@ src/
     page.tsx                # Landing / días de fiestas
     dia/[dia]/page.tsx      # Programa del día (SSG)
     api/feedback/route.ts   # API de feedback (envía email por SMTP)
+    api/stats/route.ts      # API de estadísticas (GA4 Data API)
+    info/                   # Página /info (versión, stats, compartir, instalar)
   components/
-    EventoCard.tsx           # Tarjeta de evento con botón favorito
+    EventoCard.tsx           # Tarjeta de evento con botón favorito y compartir
+    InstallPWA.tsx           # Botón instalar PWA (variant: hero | card)
+    SharePanel.tsx           # Compartir (nativo + WhatsApp, Telegram, X, Email, Instagram)
+    StatsPanel.tsx           # Panel de estadísticas (consume /api/stats)
     FiltroCategorias.tsx     # Filtros por categoría
     FiltroCategoriasWrapper.tsx  # Wrapper con estado
     FavoritosPanel.tsx       # Panel de eventos favoritos
@@ -52,6 +57,7 @@ src/
     favoritos.ts            # Lógica de localStorage
     notificaciones.ts       # Push notifications
     analytics.ts            # Helpers de tracking GA4
+    version.ts              # APP_VERSION, APP_NAME, APP_DESCRIPTION, FUENTE_OFICIAL
   types/
     evento.ts               # Tipos TypeScript
     next-pwa.d.ts           # Tipos para next-pwa
@@ -60,11 +66,13 @@ public/
   icons/                    # Iconos PWA (192x192, 512x512)
 ```
 
-## Analytics y feedback
+## Analytics, estadísticas y feedback
 
-- Eventos GA4: `pwa_install_prompt`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback` (ver `lib/analytics.ts`)
+- Eventos GA4: `pwa_install_prompt`, `pwa_install_click`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback`, `share` (ver `lib/analytics.ts`)
 - Feedback requiere variables SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `FEEDBACK_TO` (ver `.env.local.example`)
 - El envío de email solo ocurre en la ruta API (server-side). El widget usa `fetch` a `/api/feedback`
+- `/api/stats` consulta la GA4 Data API con `@google-analytics/data` y requiere: `GA_PROPERTY_ID` y credenciales de service account (`GA_CREDENTIALS_JSON_B64` en base64, o `GA_CLIENT_EMAIL` + `GA_PRIVATE_KEY`, o `GOOGLE_APPLICATION_CREDENTIALS`). Sin credenciales responde `configurado: false` y el panel muestra un aviso
+- La versión mostrada en `/info` y el footer sale de `lib/version.ts` (usa `NEXT_PUBLIC_APP_VERSION`, por defecto `0.1.0`)
 
 ## Datos de eventos
 

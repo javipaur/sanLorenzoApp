@@ -11,6 +11,9 @@ import {
   cancelarNotificacionEvento,
 } from "@/lib/notificaciones";
 import { getLugarByNombre, getZonaById, getGoogleMapsUrl } from "@/data/zonas";
+import SharePanel from "@/components/SharePanel";
+
+const SITIO_URL = "https://fiestassanlorenzo.javierpalacio.es";
 
 interface EventoCardProps {
   evento: Evento;
@@ -116,17 +119,24 @@ export default function EventoCard({ evento, actual = false }: EventoCardProps) 
         </div>
 
         {/* Favorite */}
-        <button
-          onClick={handleToggle}
-          key={animKey}
-          className={`fav-btn fav-btn-active self-start p-1.5 text-lg`}
-          style={{
-            color: favorito ? "var(--color-verde-claro)" : "var(--color-texto-terciario)",
-          }}
-          aria-label={favorito ? "Quitar de favoritos" : "Añadir a favoritos"}
-        >
-          {favorito ? "★" : "☆"}
-        </button>
+        <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+          <button
+            onClick={handleToggle}
+            key={animKey}
+            className={`fav-btn fav-btn-active self-start p-1.5 text-lg`}
+            style={{
+              color: favorito ? "var(--color-verde-claro)" : "var(--color-texto-terciario)",
+            }}
+            aria-label={favorito ? "Quitar de favoritos" : "Añadir a favoritos"}
+          >
+            {favorito ? "★" : "☆"}
+          </button>
+          <SharePanel
+            titulo={evento.titulo}
+            texto={`${evento.titulo} · ${evento.hora} · ${evento.lugar} (Fiestas de San Lorenzo 2026)`}
+            url={`${SITIO_URL}/dia/${evento.dia}`}
+          />
+        </div>
       </div>
     </div>
   );

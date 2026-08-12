@@ -9,6 +9,7 @@ const items = [
   { href: "/conciertos", label: "Música", icon: "🎵" },
   { href: "/favoritos", label: "Favoritos", icon: "☆", iconActive: "★" },
   { href: "/mapa", label: "Mapa", icon: "🗺️" },
+  { href: "/info", label: "Info", icon: "ℹ️" },
 ];
 
 export default function BottomNav() {

@@ -2,11 +2,15 @@
   "name": "Fiestas de San Lorenzo 2026",
   "short_name": "San Lorenzo",
   "description": "Programa completo de las Fiestas de San Lorenzo 2026 en Huesca",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007a5a",
   "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": ["events", "travel"],
   "icons": [
     {
       "src": "/icons/icon-192x192.png",

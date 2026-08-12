@@ -24,9 +24,7 @@ export default function InstallPWA({ variant = "card" }: InstallPWAProps) {
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
-    setInstalada(isStandalone);
-    setEsIOS(/iPhone|iPad|iPod/i.test(navigator.userAgent));
-    setListo(true);
+    const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     const onBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -41,6 +39,13 @@ export default function InstallPWA({ variant = "card" }: InstallPWAProps) {
 
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
     window.addEventListener("appinstalled", onAppInstalled);
+
+    queueMicrotask(() => {
+      setInstalada(isStandalone);
+      setEsIOS(ios);
+      setListo(true);
+    });
+
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
       window.removeEventListener("appinstalled", onAppInstalled);
