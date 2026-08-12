@@ -1,5 +1,24 @@
 import { test, expect } from "@playwright/test";
 
+const DIAS_SEMANA: Record<number, string> = {
+  9: "Domingo",
+  10: "Lunes",
+  11: "Martes",
+  12: "Miércoles",
+  13: "Jueves",
+  14: "Viernes",
+  15: "Sábado",
+};
+
+// Durante las fiestas (9-15 agosto) la landing solo muestra los días >= hoy.
+function diaVisibleEnLanding(): number {
+  const hoy = new Date();
+  const mes = hoy.getMonth() + 1;
+  const dia = hoy.getDate();
+  if (mes === 8 && dia >= 9 && dia <= 15) return dia;
+  return 9;
+}
+
 test.describe("Landing page", () => {
   test("muestra hero con título y phases", async ({ page }) => {
     await page.goto("/");
@@ -11,9 +30,12 @@ test.describe("Landing page", () => {
 
   test("muestra grid de días con día numerical", async ({ page }) => {
     await page.goto("/");
+    const diaVisible = diaVisibleEnLanding();
     await expect(page.locator("text=Agenda por días")).toBeVisible();
-    await expect(page.locator('a.dia-card[href="/dia/9"]')).toBeVisible();
-    await expect(page.locator("text=Domingo")).toBeVisible();
+    await expect(
+      page.locator(`a.dia-card[href="/dia/${diaVisible}"]`)
+    ).toBeVisible();
+    await expect(page.locator(`text=${DIAS_SEMANA[diaVisible]}`)).toBeVisible();
   });
 
   test("muestra buscador de eventos", async ({ page }) => {
@@ -39,9 +61,10 @@ test.describe("Landing page", () => {
 
   test("navega a día al hacer clic en day card", async ({ page }) => {
     await page.goto("/");
-    const dayCard = page.locator('a[href="/dia/9"]').first();
+    const diaVisible = diaVisibleEnLanding();
+    const dayCard = page.locator(`a[href="/dia/${diaVisible}"]`).first();
     await dayCard.click();
-    await expect(page).toHaveURL(/\/dia\/9/);
+    await expect(page).toHaveURL(new RegExp(`/dia/${diaVisible}`));
   });
 });
 
@@ -268,16 +291,18 @@ test.describe("Mapa", () => {
 });
 
 test.describe("Navegación", () => {
-  test("bottom nav está visible en todas las páginas", async ({ page }) => {
+  test("bottom nav está visible en las páginas principales", async ({ page }) => {
     const nav = page.locator('[aria-label="Navegación principal"]');
     await page.goto("/");
     await expect(nav).toBeVisible();
 
     await page.goto("/favoritos");
     await expect(nav).toBeVisible();
+  });
 
+  test("bottom nav se oculta en el mapa a pantalla completa", async ({ page }) => {
     await page.goto("/mapa");
-    await expect(nav).toBeVisible();
+    await expect(page.locator('[aria-label="Navegación principal"]')).toBeHidden();
   });
 
   test("bottom nav permite navegar a favoritos", async ({ page }) => {
@@ -302,6 +327,7 @@ test.describe("PWA", () => {
   });
 
   test("service worker se registra", async ({ page }) => {
+    test.setTimeout(20000);
     const swResp = await page.request.get("/sw.js");
     test.skip(swResp.status() !== 200, "Service worker no disponible en este entorno");
 
@@ -319,12 +345,21 @@ test.describe("PWA", () => {
       }
     });
     expect(swReady).toBe(true);
-  }, { timeout: 20000 });
+  });
 });
 
 test.describe("Notificaciones", () => {
-  test("al marcar favorito se programa notificación y se dispara", async ({ page, context }) => {
-    await context.grantPermissions(["notifications"]);
+  test("al marcar favorito se programa notificación y se dispara", async ({ page }) => {
+    // En headless Chromium, grantPermissions('notifications') deja el permiso en
+    // "denied". Se simula con un init script para que el permiso sea "granted".
+    await page.addInitScript(() => {
+      const permiso: NotificationPermission = "granted";
+      Object.defineProperty(Notification, "permission", {
+        get: () => permiso,
+        configurable: true,
+      });
+      Notification.requestPermission = async () => permiso;
+    });
 
     // Fijar reloj a 9 agosto 2026, 08:59:50 (10s antes del evento a las 09:00)
     await page.clock.install();
@@ -334,21 +369,35 @@ test.describe("Notificaciones", () => {
     await page.waitForSelector(".evento-card");
 
     // Espiar constructor de Notification
-    const notificationCalls: { title: string; options: NotificationOptions }[] = [];
+    interface NotifCall {
+      title: string;
+      options: NotificationOptions;
+    }
+
+    interface NotifSpyWindow {
+      __notifCalls: NotifCall[];
+      Notification: {
+        new (title: string, options?: NotificationOptions): Notification;
+        permission: NotificationPermission;
+        requestPermission: () => Promise<NotificationPermission>;
+      };
+    }
+
     await page.evaluate(() => {
-      (window as any).__notifCalls = [];
+      const w = window as unknown as NotifSpyWindow;
+      w.__notifCalls = [];
       const OrigNotif = window.Notification;
-      // eslint-disable-next-line no-global-assign
-      (window as any).Notification = function (
+      const mockNotif = function (
+        this: void,
         title: string,
         options?: NotificationOptions
       ) {
-        (window as any).__notifCalls.push({ title, options });
+        w.__notifCalls.push({ title, options: options ?? {} });
         return new OrigNotif(title, options);
-      } as any;
-      (window as any).Notification.permission = OrigNotif.permission;
-      (window as any).Notification.requestPermission =
-        OrigNotif.requestPermission.bind(OrigNotif);
+      };
+      w.Notification = mockNotif as unknown as NotifSpyWindow["Notification"];
+      w.Notification.permission = OrigNotif.permission;
+      w.Notification.requestPermission = OrigNotif.requestPermission.bind(OrigNotif);
     });
 
     // Marcar primer evento como favorito
@@ -361,9 +410,9 @@ test.describe("Notificaciones", () => {
     await page.clock.runFor(11_000);
     await page.waitForTimeout(500);
 
-    const calls = await page.evaluate(
-      () => (window as any).__notifCalls as { title: string; options: NotificationOptions }[]
-    );
+    const calls = await page.evaluate(() => {
+      return (window as unknown as NotifSpyWindow).__notifCalls;
+    });
     expect(calls.length).toBe(1);
     expect(calls[0].title).toContain("Colocación pañoleta");
     expect(calls[0].options.body).toContain("09:00");

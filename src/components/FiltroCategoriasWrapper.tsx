@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Evento, Categoria } from "@/types/evento";
+import { useEffect, useRef, useState } from "react";
+import { Evento, Categoria, DiaFiesta } from "@/types/evento";
 import EventoCard from "./EventoCard";
 import FiltroCategorias from "./FiltroCategorias";
 
 interface FiltroCategoriasWrapperProps {
+  dia: DiaFiesta;
   eventos: Evento[];
 }
 
@@ -15,12 +16,52 @@ const momentos = [
   { id: "noche", nombre: "Noche" },
 ];
 
+function horaEnMinutos(hora: string): number {
+  const [h, m] = hora.split(":").map(Number);
+  return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
+}
+
 export default function FiltroCategoriasWrapper({
+  dia,
   eventos,
 }: FiltroCategoriasWrapperProps) {
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<
     Categoria[]
   >([]);
+  const [eventoActualId, setEventoActualId] = useState<string | null>(null);
+  const scrolledRef = useRef(false);
+
+  useEffect(() => {
+    if (scrolledRef.current) return;
+    const diaNum = Number(dia.id);
+    if (isNaN(diaNum) || eventos.length === 0) return;
+
+    const ahora = new Date();
+    const esHoy =
+      ahora.getDate() === dia.dia &&
+      ahora.getMonth() + 1 === dia.mes &&
+      ahora.getFullYear() === dia.anio;
+    if (!esHoy) return;
+
+    const ahoraMin = ahora.getHours() * 60 + ahora.getMinutes();
+    const ordenados = [...eventos].sort(
+      (a, b) => horaEnMinutos(a.hora) - horaEnMinutos(b.hora)
+    );
+
+    let objetivo = ordenados[0];
+    for (const ev of ordenados) {
+      if (horaEnMinutos(ev.hora) <= ahoraMin) objetivo = ev;
+      else break;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      scrolledRef.current = true;
+      setEventoActualId(objetivo.id);
+      const el = document.getElementById(`evento-${objetivo.id}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [dia, eventos]);
 
   const eventosFiltrados =
     categoriasSeleccionadas.length === 0
@@ -83,7 +124,12 @@ export default function FiltroCategoriasWrapper({
                 style={{ borderLeft: "2px solid var(--color-borde)" }}
               >
                 {eventosMomento.map((evento, idx) => (
-                  <div key={evento.id} className="relative mb-3 last:mb-0">
+                  <div
+                    key={evento.id}
+                    id={`evento-${evento.id}`}
+                    data-ahora={evento.id === eventoActualId}
+                    className="evento-wrap relative mb-3 last:mb-0"
+                  >
                     {/* Dot */}
                     <div
                       className="timeline-dot absolute -left-[29px] top-4"
@@ -93,7 +139,7 @@ export default function FiltroCategoriasWrapper({
                           : undefined
                       }
                     />
-                    <EventoCard evento={evento} />
+                    <EventoCard evento={evento} actual={evento.id === eventoActualId} />
                   </div>
                 ))}
               </div>

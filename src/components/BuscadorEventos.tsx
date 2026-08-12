@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { eventos, categorias } from "@/data/eventos";
+import { trackBusqueda } from "@/lib/analytics";
 
 export default function BuscadorEventos() {
   const [query, setQuery] = useState("");
@@ -47,7 +48,10 @@ export default function BuscadorEventos() {
           ref={inputRef}
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            trackBusqueda(e.target.value);
+          }}
           onFocus={() => setFocused(true)}
           placeholder="Buscar eventos, artistas, lugares..."
           className="w-full pl-9 pr-4 py-3 rounded-2xl text-sm font-medium outline-none transition-shadow"

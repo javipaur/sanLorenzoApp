@@ -14,9 +14,10 @@ import { getLugarByNombre, getZonaById, getGoogleMapsUrl } from "@/data/zonas";
 
 interface EventoCardProps {
   evento: Evento;
+  actual?: boolean;
 }
 
-export default function EventoCard({ evento }: EventoCardProps) {
+export default function EventoCard({ evento, actual = false }: EventoCardProps) {
   const { esFavorito, toggleFavorito } = useFavoritos();
   const favorito = esFavorito(evento.id);
   const categoria = categorias.find((c) => c.id === evento.categoria);
@@ -56,6 +57,7 @@ export default function EventoCard({ evento }: EventoCardProps) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
+            {actual && <span className="evento-ahora-badge">AHORA</span>}
             <span className="text-sm" title={categoria?.nombre}>
               {categoria?.emoji || "📌"}
             </span>

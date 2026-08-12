@@ -4,6 +4,7 @@ import { diasFiesta } from "@/data/eventos";
 import FiltroCategoriasWrapper from "@/components/FiltroCategoriasWrapper";
 import FavoritosPanel from "@/components/FavoritosPanel";
 import MobileFavoritesBar from "@/components/MobileFavoritesBar";
+import EstadoDia from "@/components/EstadoDia";
 
 interface PageProps {
   params: Promise<{ dia: string }>;
@@ -77,6 +78,9 @@ export default async function DiaPage({ params }: PageProps) {
               <p className="text-sm text-white/60">
                 {dia.fecha} &middot; {dia.eventos.length} eventos
               </p>
+              <div className="mt-2">
+                <EstadoDia dia={dia} />
+              </div>
             </div>
           </div>
         </div>
@@ -87,7 +91,7 @@ export default async function DiaPage({ params }: PageProps) {
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
           {/* Timeline */}
           <div>
-            <FiltroCategoriasWrapper eventos={dia.eventos} />
+            <FiltroCategoriasWrapper dia={dia} eventos={dia.eventos} />
           </div>
 
           {/* Sidebar */}

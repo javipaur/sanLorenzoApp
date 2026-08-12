@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore, useCallback } from "react";
+import { trackFavorito } from "@/lib/analytics";
 
 const FAVORITOS_KEY = "sanlorenzo-favoritos";
 
@@ -53,10 +54,12 @@ export function useFavoritos() {
   const favoritos = useSyncExternalStore(subscribe, getSnapshot, () => []);
 
   const toggleFavorito = useCallback((eventoId: string) => {
-    const next = cacheFavoritos.includes(eventoId)
-      ? cacheFavoritos.filter((id) => id !== eventoId)
-      : [...cacheFavoritos, eventoId];
+    const anadido = !cacheFavoritos.includes(eventoId);
+    const next = anadido
+      ? [...cacheFavoritos, eventoId]
+      : cacheFavoritos.filter((id) => id !== eventoId);
     setFavoritos(next);
+    trackFavorito(eventoId, anadido ? "anadido" : "eliminado");
   }, []);
 
   const esFavorito = useCallback(

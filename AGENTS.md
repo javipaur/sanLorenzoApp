@@ -14,7 +14,9 @@ Agenda digital de las Fiestas de San Lorenzo 2026 - Huesca. Web en Next.js con:
 - **Lenguaje:** TypeScript
 - **Estilos:** Tailwind CSS v4
 - **PWA:** next-pwa
-- **Storage local:** `localStorage` para favoritos (no hay backend)
+- **Analytics:** Google Analytics 4 (GTM tag en `Analytics.tsx`, helpers en `lib/analytics.ts`)
+- **Feedback:** Formulario + API `/api/feedback` con envío por SMTP (nodemailer)
+- **Storage local:** `localStorage` para favoritos (no hay backend de datos)
 
 ## Comandos
 
@@ -37,16 +39,19 @@ src/
     layout.tsx              # Layout raíz, metadata, manifest PWA
     page.tsx                # Landing / días de fiestas
     dia/[dia]/page.tsx      # Programa del día (SSG)
+    api/feedback/route.ts   # API de feedback (envía email por SMTP)
   components/
     EventoCard.tsx           # Tarjeta de evento con botón favorito
     FiltroCategorias.tsx     # Filtros por categoría
     FiltroCategoriasWrapper.tsx  # Wrapper con estado
     FavoritosPanel.tsx       # Panel de eventos favoritos
+    FeedbackWidget.tsx       # Botón flotante + formulario de feedback
   data/
     eventos.ts              # Datos de eventos (fuente de verdad)
   lib/
     favoritos.ts            # Lógica de localStorage
     notificaciones.ts       # Push notifications
+    analytics.ts            # Helpers de tracking GA4
   types/
     evento.ts               # Tipos TypeScript
     next-pwa.d.ts           # Tipos para next-pwa
@@ -54,6 +59,12 @@ public/
   manifest.json             # Manifest PWA
   icons/                    # Iconos PWA (192x192, 512x512)
 ```
+
+## Analytics y feedback
+
+- Eventos GA4: `pwa_install_prompt`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback` (ver `lib/analytics.ts`)
+- Feedback requiere variables SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `FEEDBACK_TO` (ver `.env.local.example`)
+- El envío de email solo ocurre en la ruta API (server-side). El widget usa `fetch` a `/api/feedback`
 
 ## Datos de eventos
 
