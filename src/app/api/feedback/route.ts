@@ -41,12 +41,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const user = process.env.SMTP_USER || process.env.EMAIL_USER || "";
+  const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+  const esGmail = /@gmail\.com$/i.test(user);
+  const host =
+    process.env.SMTP_HOST ||
+    process.env.EMAIL_SMTP_HOST ||
+    (esGmail ? "smtp.gmail.com" : "");
+  const port = Number(
+    process.env.SMTP_PORT || process.env.EMAIL_SMTP_PORT || 587
+  );
   const from = process.env.SMTP_FROM || user || "";
-  const to = process.env.FEEDBACK_TO;
+  const to = process.env.FEEDBACK_TO || user || "";
 
   if (!host || !to) {
     return NextResponse.json(
