@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { trackGA4 } from "@/lib/analytics";
+import { track } from "@/lib/analytics";
 
 interface SharePanelProps {
   titulo: string;
@@ -67,7 +67,7 @@ export default function SharePanel({
 
   const abrir = async () => {
     if (canUseNativeShare()) {
-      trackGA4("share", { destino: "nativo" });
+      track("share", { destino: "nativo" });
       try {
         await navigator.share({ title: titulo, text: texto, url });
       } catch {
@@ -82,14 +82,14 @@ export default function SharePanel({
     try {
       await navigator.clipboard.writeText(url);
       setCopiado(true);
-      trackGA4("share", { destino: "copiar_enlace" });
+      track("share", { destino: "copiar_enlace" });
       setTimeout(() => setCopiado(false), 2000);
     } catch {
       // Sin acceso al portapapeles; se ignora.
     }
   };
 
-  const registrar = (destino: string) => () => trackGA4("share", { destino });
+  const registrar = (destino: string) => () => track("share", { destino });
 
   const enlaceWhatsApp = `https://wa.me/?text=${encodeURIComponent(`${texto}\n${url}`)}`;
   const enlaceTelegram = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(texto)}`;

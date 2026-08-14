@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { trackGA4 } from "@/lib/analytics";
+import { track } from "@/lib/analytics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -29,12 +29,10 @@ export default function InstallPWA({ variant = "card" }: InstallPWAProps) {
     const onBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      trackGA4("pwa_install_prompt");
     };
     const onAppInstalled = () => {
       setDeferredPrompt(null);
       setInstalada(true);
-      trackGA4("pwa_installed");
     };
 
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
@@ -57,7 +55,7 @@ export default function InstallPWA({ variant = "card" }: InstallPWAProps) {
       if (esIOS) setMostrarAyudaIOS((v) => !v);
       return;
     }
-    trackGA4("pwa_install_click");
+    track("pwa_install_click");
     const promptEvent = deferredPrompt;
     setDeferredPrompt(null);
     try {
@@ -65,7 +63,6 @@ export default function InstallPWA({ variant = "card" }: InstallPWAProps) {
       const choice = await promptEvent.userChoice;
       if (choice.outcome === "accepted") {
         setInstalada(true);
-        trackGA4("pwa_installed");
       }
     } catch {
       // El navegador puede lanzar el prompt una única vez; sin problema.

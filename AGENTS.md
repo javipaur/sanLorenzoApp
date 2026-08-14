@@ -14,7 +14,7 @@ Agenda digital de las Fiestas de San Lorenzo 2026 - Huesca. Web en Next.js con:
 - **Lenguaje:** TypeScript
 - **Estilos:** Tailwind CSS v4
 - **PWA:** next-pwa
-- **Analytics:** Google Analytics 4 (GTM tag en `Analytics.tsx`, helpers en `lib/analytics.ts`). Estadísticas de uso vía GA4 Data API (`@google-analytics/data`) en `/api/stats`
+- **Analytics:** Google Analytics 4 (GTM tag en `Analytics.tsx`, helpers en `lib/analytics.ts`). Estadísticas de uso vía GA4 Data API (`@google-analytics/data`) en `/api/stats`. Complemento con PostHog (`posthog-js`, `lib/posthog.ts`): todo evento de `lib/analytics.ts` se envía a GA4 y PostHog vía `track()`. Instalaciones PWA (`pwa_install_prompt`, `pwa_installed`, `pwa_install_click`, `pwa_standalone_use`) se registran solo en `Analytics.tsx` (fuente única, evitando dobles conteos); `InstallPWA.tsx` solo gestiona la UI
 - **Feedback:** Formulario + API `/api/feedback` con envío por SMTP (nodemailer)
 - **Storage local:** `localStorage` para favoritos (no hay backend de datos)
 
@@ -56,7 +56,8 @@ src/
   lib/
     favoritos.ts            # Lógica de localStorage
     notificaciones.ts       # Push notifications
-    analytics.ts            # Helpers de tracking GA4
+    analytics.ts            # Helpers de tracking (GA4 + PostHog vía track())
+    posthog.ts              # Init y helpers de PostHog
     version.ts              # APP_VERSION, APP_NAME, APP_DESCRIPTION, FUENTE_OFICIAL
   types/
     evento.ts               # Tipos TypeScript
@@ -68,7 +69,8 @@ public/
 
 ## Analytics, estadísticas y feedback
 
-- Eventos GA4: `pwa_install_prompt`, `pwa_install_click`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback`, `share` (ver `lib/analytics.ts`)
+- Eventos: `pwa_install_prompt`, `pwa_install_click`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback`, `share` (ver `lib/analytics.ts`). Todos se envían a GA4 y PostHog vía `track()`
+- PostHog requiere `NEXT_PUBLIC_POSTHOG_KEY` y opcionalmente `NEXT_PUBLIC_POSTHOG_HOST` (ver `.env.local.example`). Sin ellas solo funciona GA4
 - Feedback requiere variables SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `FEEDBACK_TO` (ver `.env.local.example`)
 - El envío de email solo ocurre en la ruta API (server-side). El widget usa `fetch` a `/api/feedback`
 - `/api/stats` consulta la GA4 Data API con `@google-analytics/data` y requiere: `GA_PROPERTY_ID` y credenciales de service account (`GA_CREDENTIALS_JSON_B64` en base64, o `GA_CLIENT_EMAIL` + `GA_PRIVATE_KEY`, o `GOOGLE_APPLICATION_CREDENTIALS`). Sin credenciales responde `configurado: false` y el panel muestra un aviso
