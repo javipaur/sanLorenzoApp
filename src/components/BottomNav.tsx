@@ -17,13 +17,14 @@ export default function BottomNav() {
   const [mounted, setMounted] = useState(false);
 
   const isMapa = pathname.startsWith("/mapa");
+  const esGracias = pathname === "/gracias";
 
   useEffect(() => {
     const timer = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(timer);
   }, []);
 
-  if (isMapa) return null;
+  if (isMapa || esGracias) return null;
 
   return (
     <nav

@@ -46,6 +46,16 @@ export default function FeedbackWidget() {
     };
   }, [abierto]);
 
+  useEffect(() => {
+    function abrirExterno() {
+      setEstado("idle");
+      setAbierto(true);
+      trackFeedback("abierto");
+    }
+    window.addEventListener("feedback:abrir", abrirExterno);
+    return () => window.removeEventListener("feedback:abrir", abrirExterno);
+  }, []);
+
   if (esMapa) return null;
 
   const abrir = () => {

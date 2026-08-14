@@ -4,6 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import NotificacionesInit from "@/components/NotificacionesInit";
 import Analytics from "@/components/Analytics";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import FinFiestasRedirect from "@/components/FinFiestasRedirect";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -93,6 +94,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body className="min-h-full flex flex-col">
+        <FinFiestasRedirect />
         <Analytics />
         <NotificacionesInit />
         {children}
