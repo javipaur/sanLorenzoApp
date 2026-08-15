@@ -44,6 +44,7 @@ src/
     info/                   # Página /info (versión, stats, compartir, instalar)
   components/
     EventoCard.tsx           # Tarjeta de evento con botón favorito y compartir
+    BotonCalendario.tsx      # Añadir al calendario (Google Calendar + .ics)
     InstallPWA.tsx           # Botón instalar PWA (variant: hero | card)
     SharePanel.tsx           # Compartir (nativo + WhatsApp, Telegram, X, Email, Instagram)
     StatsPanel.tsx           # Panel de estadísticas (consume /api/stats)
@@ -51,11 +52,16 @@ src/
     FiltroCategoriasWrapper.tsx  # Wrapper con estado
     FavoritosPanel.tsx       # Panel de eventos favoritos
     FeedbackWidget.tsx       # Botón flotante + formulario de feedback
+    CuentaAtras.tsx          # Cuenta atrás del hero (pre-fiestas y durante)
+    NoTeLoPierdas.tsx        # Selección editorial diaria "No te lo pierdas"
   data/
     eventos.ts              # Datos de eventos (fuente de verdad)
+    destacados.ts           # Destacados editoriales por día (ids referencian eventos.ts)
+    zonas.ts                # Zonas y lugares de Huesca para el mapa
   lib/
     favoritos.ts            # Lógica de localStorage
     notificaciones.ts       # Push notifications
+    calendario.ts           # Generación ICS y enlaces de Google Calendar
     analytics.ts            # Helpers de tracking (GA4 + PostHog vía track())
     posthog.ts              # Init y helpers de PostHog
     version.ts              # APP_VERSION, APP_NAME, APP_DESCRIPTION, FUENTE_OFICIAL
@@ -69,7 +75,8 @@ public/
 
 ## Analytics, estadísticas y feedback
 
-- Eventos: `pwa_install_prompt`, `pwa_install_click`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback`, `share` (ver `lib/analytics.ts`). Todos se envían a GA4 y PostHog vía `track()`
+- Eventos: `pwa_install_prompt`, `pwa_install_click`, `pwa_installed`, `pwa_standalone_use`, `favorito`, `busqueda`, `feedback`, `share`, `calendario` (ver `lib/analytics.ts`). Todos se envían a GA4 y PostHog vía `track()`
+- Añadir a calendario: `lib/calendario.ts` genera ICS (client-side, sin backend) y enlaces de Google Calendar. `BotonCalendario.tsx` ofrece popover con Google Calendar (1 evento) y descarga .ics (evento o favoritos completos). Params de `calendario`: `destino` (`google` | `ics`), `eventos`
 - PostHog requiere `NEXT_PUBLIC_POSTHOG_KEY` y opcionalmente `NEXT_PUBLIC_POSTHOG_HOST` (ver `.env.local.example`). Sin ellas solo funciona GA4
 - Feedback requiere variables SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `FEEDBACK_TO` (ver `.env.local.example`)
 - El envío de email solo ocurre en la ruta API (server-side). El widget usa `fetch` a `/api/feedback`

@@ -192,7 +192,7 @@ function EventoMusical({
             style={{ color: "var(--color-verde-oscuro)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            Cómo llegar →
+            Cómo llegar
           </a>
           {!esDiaGrande && (
             <Link

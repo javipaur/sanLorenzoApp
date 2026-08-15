@@ -4,6 +4,7 @@ import EventosCercanos from "@/components/EventosCercanos";
 import BuscadorEventos from "@/components/BuscadorEventos";
 import AgendaDiasGrid from "@/components/AgendaDiasGrid";
 import InstallPWA from "@/components/InstallPWA";
+import CuentaAtras from "@/components/CuentaAtras";
 import { APP_VERSION } from "@/lib/version";
 
 function getFaseActual(): string {
@@ -29,7 +30,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Hero ── */}
-      <header className="festival-header text-white py-16 px-4 sm:py-24">
+      <header className="festival-header festival-header-foto text-white py-16 px-4 sm:py-24">
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <div className="hero-date-strip mb-6">
             Huesca &middot; Julio – Agosto 2026
@@ -47,6 +48,8 @@ export default function Home() {
             <br />
             Del 9 de julio al 15 de agosto.
           </p>
+
+          <CuentaAtras />
 
           {/* Search */}
           <div className="mt-8 max-w-md mx-auto">
@@ -107,7 +110,7 @@ export default function Home() {
                       className="text-xs font-semibold group-hover:underline"
                       style={{ color: "var(--color-verde-oscuro)" }}
                     >
-                      Ver programa &rarr;
+                      Ver el programa completo
                     </span>
                   </div>
                 </Link>
@@ -147,7 +150,7 @@ export default function Home() {
                       className="text-xs font-semibold group-hover:underline"
                       style={{ color: "var(--color-verde-oscuro)" }}
                     >
-                      Ver programa &rarr;
+                      Ver el programa completo
                     </span>
                   </div>
                 </Link>
@@ -209,16 +212,17 @@ export default function Home() {
                     className="text-lg font-bold mb-1"
                     style={{ fontFamily: "var(--font-display)", color: "var(--color-texto)" }}
                   >
-                    Explora el mapa
+                    El mapa de las fiestas
                   </h3>
                   <p className="text-sm" style={{ color: "var(--color-texto-secundario)" }}>
-                    15 zonas de Huesca con colores diferenciados. Descubre los espacios de las fiestas y localiza eventos por barrios.
+                    Las fiestas se viven en la calle. Mira dónde está cada evento, barrio a
+                    barrio, y qué se organiza cerca de ti.
                   </p>
                   <span
                     className="inline-block mt-2 text-xs font-semibold group-hover:underline"
                     style={{ color: "var(--color-verde-oscuro)" }}
                   >
-                    Abrir mapa interactivo &rarr;
+                    Abrir el mapa de Huesca
                   </span>
                 </div>
               </div>
@@ -239,7 +243,7 @@ export default function Home() {
                 className="text-xs font-semibold hover:underline"
                 style={{ color: "var(--color-verde-oscuro)" }}
               >
-                Ver todo &rarr;
+                Ver toda la música
               </Link>
             </div>
 
@@ -353,7 +357,7 @@ export default function Home() {
                 color: "var(--color-verde-oscuro)",
               }}
             >
-              Ver los {totalEventos} eventos musicales &rarr;
+              Ver los {totalEventos} eventos musicales
             </Link>
           </div>
         </section>
@@ -420,17 +424,30 @@ export default function Home() {
             >
               Javier Palacio
             </a>
-            . Hecho con{" "}
-            <svg
-              className="size-3.5 text-red-500 inline"
-              aria-label="amor"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
+            {" "}&middot; hecha en Huesca, a ritmo de charanga
+          </p>
+          <p className="text-[10px] mt-2" style={{ color: "var(--color-texto-terciario)" }}>
+            Foto del hero:{" "}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Catedral_de_Huesca_con_fuegos_artificiales_durante_las_fiestas_de_San_Lorenzo.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+              style={{ color: "var(--color-verde)" }}
             >
-              <path d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037.033l.034-.03a6 6 0 0 1 4.733-1.44l.246.036a6 6 0 0 1 3.364 10.008l-.18.185l-.048.041l-7.45 7.379a1 1 0 0 1-1.313.082l-.094-.082l-7.493-7.422a6 6 0 0 1 3.176-10.215z" />
-            </svg>
-            en Huesca
+              Saul Moya
+            </a>{" "}
+            &middot;{" "}
+            <a
+              href="https://creativecommons.org/licenses/by-sa/4.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+              style={{ color: "var(--color-verde)" }}
+            >
+              CC BY-SA 4.0
+            </a>{" "}
+            &middot; Wikimedia Commons
           </p>
           <p className="text-[10px] mt-2" style={{ color: "var(--color-texto-terciario)" }}>
             v{APP_VERSION}

@@ -40,6 +40,23 @@ body {
   isolation: isolate;
 }
 
+.festival-header-foto {
+  background-color: var(--color-verde-oscuro);
+  background-image:
+    linear-gradient(rgba(5, 51, 38, 0.55), rgba(5, 51, 38, 0.78)),
+    url("/images/hero-fuegos-catedral.jpg");
+  background-size: cover;
+  background-position: center 28%;
+}
+
+@media (max-width: 640px) {
+  .festival-header-foto {
+    background-image:
+      linear-gradient(rgba(5, 51, 38, 0.55), rgba(5, 51, 38, 0.78)),
+      url("/images/hero-fuegos-catedral-900.jpg");
+  }
+}
+
 .festival-header::before {
   content: "";
   position: absolute;
@@ -79,6 +96,46 @@ body {
   width: 20px;
   height: 1px;
   background: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Cuenta atrás del hero ── */
+.cuenta-atras {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.cuenta-atras-num {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1;
+  color: white;
+}
+
+.cuenta-atras-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cuenta-atras-chip {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 /* ── Phase timeline (vertical) ── */
@@ -315,8 +372,11 @@ body {
 }
 
 .bottom-nav-icon {
-  font-size: 1.15rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -763,6 +823,31 @@ body {
   font-weight: 500;
   color: var(--color-texto-secundario);
   line-height: 1.2;
+}
+
+/* ── "No te lo pierdas" editorial strip ── */
+.picks-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+}
+
+.picks-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.picks-card {
+  scroll-snap-align: start;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.picks-card:hover {
+  transform: translateY(-2px);
+}
+
+.picks-card:focus-visible {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 2px;
 }
 
 /* ── Map animations ── */

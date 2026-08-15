@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useFavoritos } from "@/lib/favoritos";
 import { eventos } from "@/data/eventos";
 import EventoCard from "@/components/EventoCard";
+import BotonCalendario from "@/components/BotonCalendario";
 
 const diasSemana: Record<number, string> = {
   9: "Domingo",
@@ -100,6 +101,33 @@ export default function FavoritosPage() {
           </div>
         ) : (
           <div className="space-y-8">
+            <div
+              className="rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+              style={{
+                border: "1px solid var(--color-borde-claro)",
+                background: "var(--color-fondo)",
+              }}
+            >
+              <div className="flex-1">
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--color-texto)" }}
+                >
+                  Pásatelo a tu calendario
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--color-texto-secundario)" }}>
+                  Descarga tus {eventosFavoritos.length} eventos guardados en un archivo .ics.
+                </p>
+              </div>
+              <div className="w-full sm:w-auto">
+                <BotonCalendario
+                  eventos={eventosFavoritos}
+                  variant="boton"
+                  etiqueta="Añadir al calendario"
+                />
+              </div>
+            </div>
+
             {agrupados.map((grupo) => (
               <section key={grupo.label}>
                 <div className="flex items-center gap-2 mb-3">

@@ -12,6 +12,7 @@ import {
 } from "@/lib/notificaciones";
 import { getLugarByNombre, getZonaById, getGoogleMapsUrl } from "@/data/zonas";
 import SharePanel from "@/components/SharePanel";
+import BotonCalendario from "@/components/BotonCalendario";
 
 const SITIO_URL = "https://fiestassanlorenzo.javierpalacio.es";
 
@@ -108,7 +109,7 @@ export default function EventoCard({ evento, actual = false }: EventoCardProps) 
               style={{ color: "var(--color-verde-oscuro)" }}
               onClick={(e) => e.stopPropagation()}
             >
-              Cómo llegar →
+              Cómo llegar
             </a>
           </div>
           {evento.organizador && (
@@ -136,6 +137,7 @@ export default function EventoCard({ evento, actual = false }: EventoCardProps) 
             texto={`${evento.titulo} · ${evento.hora} · ${evento.lugar} (Fiestas de San Lorenzo 2026)`}
             url={`${SITIO_URL}/dia/${evento.dia}`}
           />
+          <BotonCalendario evento={evento} />
         </div>
       </div>
     </div>

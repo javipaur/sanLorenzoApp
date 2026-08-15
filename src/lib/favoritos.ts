@@ -17,6 +17,7 @@ function leerFavoritos(): string[] {
 
 let cacheFavoritos: string[] = [];
 let cacheLoaded = false;
+const snapshotServer: string[] = [];
 const listeners: Set<() => void> = new Set();
 
 function emitChange() {
@@ -51,7 +52,7 @@ function setFavoritos(next: string[]) {
 }
 
 export function useFavoritos() {
-  const favoritos = useSyncExternalStore(subscribe, getSnapshot, () => []);
+  const favoritos = useSyncExternalStore(subscribe, getSnapshot, () => snapshotServer);
 
   const toggleFavorito = useCallback((eventoId: string) => {
     const anadido = !cacheFavoritos.includes(eventoId);

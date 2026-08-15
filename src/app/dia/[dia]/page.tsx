@@ -5,6 +5,7 @@ import FiltroCategoriasWrapper from "@/components/FiltroCategoriasWrapper";
 import FavoritosPanel from "@/components/FavoritosPanel";
 import MobileFavoritesBar from "@/components/MobileFavoritesBar";
 import EstadoDia from "@/components/EstadoDia";
+import NoTeLoPierdas from "@/components/NoTeLoPierdas";
 
 interface PageProps {
   params: Promise<{ dia: string }>;
@@ -91,6 +92,7 @@ export default async function DiaPage({ params }: PageProps) {
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
           {/* Timeline */}
           <div>
+            <NoTeLoPierdas diaId={diaId} />
             <FiltroCategoriasWrapper dia={dia} eventos={dia.eventos} />
           </div>
 

@@ -12,7 +12,7 @@ export default function GraciasPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Hero ── */}
-      <header className="festival-header text-white py-16 px-4 sm:py-24">
+      <header className="festival-header festival-header-foto text-white py-16 px-4 sm:py-24">
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <div className="hero-date-strip mb-6">
             Huesca &middot; San Lorenzo {ANIO_FIESTAS}
@@ -91,7 +91,7 @@ export default function GraciasPage() {
                 className="text-xs font-semibold hover:underline"
                 style={{ color: "var(--color-verde-oscuro)" }}
               >
-                Web oficial de las fiestas &rarr;
+                Web oficial de las fiestas
               </a>
             </div>
           </div>
@@ -139,7 +139,30 @@ export default function GraciasPage() {
             >
               Javier Palacio
             </a>
-            . Hecho con amor en Huesca
+            {" "}&middot; hecha en Huesca, a ritmo de charanga
+          </p>
+          <p className="text-[10px] mt-2" style={{ color: "var(--color-texto-terciario)" }}>
+            Foto del hero:{" "}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Catedral_de_Huesca_con_fuegos_artificiales_durante_las_fiestas_de_San_Lorenzo.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+              style={{ color: "var(--color-verde)" }}
+            >
+              Saul Moya
+            </a>{" "}
+            &middot;{" "}
+            <a
+              href="https://creativecommons.org/licenses/by-sa/4.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+              style={{ color: "var(--color-verde)" }}
+            >
+              CC BY-SA 4.0
+            </a>{" "}
+            &middot; Wikimedia Commons
           </p>
           <p className="text-[10px] mt-2" style={{ color: "var(--color-texto-terciario)" }}>
             v{APP_VERSION}
