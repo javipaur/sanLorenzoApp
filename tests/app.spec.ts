@@ -56,7 +56,7 @@ test.describe("Landing page", () => {
 
   test("muestra sección de mapa", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("text=Mapa interactivo")).toBeVisible();
+    await expect(page.locator("text=El mapa de las fiestas")).toBeVisible();
   });
 
   test("navega a día al hacer clic en day card", async ({ page }) => {
@@ -174,7 +174,7 @@ test.describe("Favoritos", () => {
 
     await page.goto("/favoritos");
     await expect(page.locator("text=Mis Favoritos")).toBeVisible();
-    await expect(page.locator("text=eventos guardados")).toBeVisible();
+    await expect(page.getByText(/^\d+ eventos guardados$/)).toBeVisible();
     const cards = page.locator(".evento-card");
     expect(await cards.count()).toBeGreaterThanOrEqual(1);
   });
@@ -361,9 +361,11 @@ test.describe("Notificaciones", () => {
       Notification.requestPermission = async () => permiso;
     });
 
-    // Fijar reloj a 9 agosto 2026, 08:59:50 (10s antes del evento a las 09:00)
+    // Fijar reloj a 9 agosto 2026, 08:30:00. Hora suficientemente temprana para
+    // que el disparo (evento - ANTES_MS) quede en el futuro sea cual sea el retraso
+    // configurado: 15 min por defecto (disparo 08:45) o 1s en modo test (08:59:59).
     await page.clock.install();
-    await page.clock.setSystemTime(new Date("2026-08-09T08:59:50"));
+    await page.clock.setSystemTime(new Date("2026-08-09T08:30:00"));
 
     await page.goto("/dia/9");
     await page.waitForSelector(".evento-card");
@@ -405,9 +407,10 @@ test.describe("Notificaciones", () => {
     await favBtn.click();
     await page.waitForTimeout(200);
 
-    // Avanzar reloj 11 segundos (pasamos de 08:59:50 a 09:00:01)
-    // Con NEXT_PUBLIC_NOTIFICATION_TEST_DELAY=1000, el timer dispara a los 9s
-    await page.clock.runFor(11_000);
+    // Avanzar reloj 31 minutos para cubrir cualquier retraso configurado:
+    // con el valor por defecto (15 min) el timer dispara a los 15 min; en modo
+    // test (1s) a los ~30 min. Ambos quedan dentro de la ventana.
+    await page.clock.runFor(31 * 60 * 1000);
     await page.waitForTimeout(500);
 
     const calls = await page.evaluate(() => {

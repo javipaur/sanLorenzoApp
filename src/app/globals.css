@@ -24,12 +24,17 @@
   --font-body: "DM Sans", sans-serif;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
 }
 
 /* ── Festival header ── */
@@ -311,7 +316,7 @@ body {
 /* ── Bottom navigation (floating pill) ── */
 .bottom-nav {
   position: fixed;
-  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%) translateY(20px);
   opacity: 0;
@@ -906,7 +911,7 @@ body {
 /* ── Feedback widget ── */
 .feedback-fab {
   position: fixed;
-  bottom: 92px;
+  bottom: calc(92px + env(safe-area-inset-bottom));
   right: 16px;
   z-index: 45;
   width: 52px;

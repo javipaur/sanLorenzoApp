@@ -27,7 +27,7 @@ export default function NoTeLoPierdas({ diaId }: NoTeLoPierdasProps) {
         Lo que no hay que dejar escapar este día, dicho por quien lo conoce.
       </p>
 
-      <div className="picks-scroll flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+      <div className="picks-scroll flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 w-full max-w-full">
         {picks.map((pick) => {
           const ev = eventos.find((e) => e.id === pick.eventoId);
           if (!ev) return null;

@@ -15,11 +15,12 @@ export default function MobileFavoritesBar({ eventos }: MobileFavoritesBarProps)
 
   return (
     <div
-      className="lg:hidden fixed left-0 right-0 p-4 bg-white"
+      className="lg:hidden fixed left-0 right-0 p-4 bg-white max-h-[45vh] overflow-y-auto"
       style={{
-        bottom: "90px",
+        bottom: "calc(90px + env(safe-area-inset-bottom))",
         borderTop: "1px solid var(--color-borde)",
         boxShadow: "0 -4px 16px rgba(0,0,0,0.06)",
+        WebkitOverflowScrolling: "touch",
       }}
     >
       <FavoritosPanel eventos={eventos} emptyBehavior="hide" />

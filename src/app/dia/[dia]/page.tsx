@@ -53,7 +53,7 @@ export default async function DiaPage({ params }: PageProps) {
           >
             &larr; Volver al programa
           </Link>
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             {isNumericDay ? (
               <span
                 className="text-4xl sm:text-5xl font-black leading-none text-white"
@@ -69,7 +69,7 @@ export default async function DiaPage({ params }: PageProps) {
                 {dia.id === "prelaurentis" ? "PRE" : "PORT"}
               </span>
             )}
-            <div>
+            <div className="min-w-0 flex-1">
               <h1
                 className="text-xl sm:text-2xl font-bold"
                 style={{ fontFamily: "var(--font-display)" }}
@@ -88,10 +88,10 @@ export default async function DiaPage({ params }: PageProps) {
       </header>
 
       {/* Main */}
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6 sm:py-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+      <main className="flex-1 max-w-4xl mx-auto w-full min-w-0 px-4 py-6 sm:py-8">
+        <div className="grid grid-cols-1 gap-6 min-w-0 lg:grid-cols-[minmax(0,1fr)_280px]">
           {/* Timeline */}
-          <div>
+          <div className="min-w-0">
             <NoTeLoPierdas diaId={diaId} />
             <FiltroCategoriasWrapper dia={dia} eventos={dia.eventos} />
           </div>
